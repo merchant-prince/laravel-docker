@@ -45,7 +45,7 @@ class Question:
         """
 
         for try_count in range(0, self.max_tries):
-            answer = input(f"{self.question} ({try_count}/{self.max_tries}): ")
+            answer = input(self.question)
 
             try:
                 for validator in self.validators:

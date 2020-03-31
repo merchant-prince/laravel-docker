@@ -1,8 +1,8 @@
 import os
-import tests.utils as utils
 from unittest import TestCase
 from laravel_docker.core.options import Options
 from scripting_utilities.cd import ChangeDirectory
+from tests.utils import suppressed_stdout, send_input
 
 
 class TestOptions(TestCase):
@@ -20,7 +20,7 @@ class TestOptions(TestCase):
         project_name = "project-one"
         max_tries = 3
 
-        with utils.suppressed_stdout(), utils.send_input(f"{project_name}\n" * max_tries):
+        with suppressed_stdout(), send_input(f"{project_name}\n" * max_tries):
             self.assertRaises(ValueError, options._ask_for_project_name)
 
 
@@ -34,7 +34,7 @@ class TestOptions(TestCase):
                 options = Options()
                 max_tries = 3
 
-                with utils.suppressed_stdout(), utils.send_input(f"{project_name}\n" * max_tries):
+                with suppressed_stdout(), send_input(f"{project_name}\n" * max_tries):
                     self.assertRaises(ValueError, options._ask_for_project_name)
             finally:
                 os.rmdir(project_name)
@@ -44,7 +44,37 @@ class TestOptions(TestCase):
         options = Options()
         project_name = "CorrectProjectName"
 
-        with utils.suppressed_stdout(), utils.send_input(project_name):
-            options._ask_for_project_name()
+        with suppressed_stdout(), send_input(project_name):
+            captured_project_name = options._ask_for_project_name()
 
-        self.assertEquals(options.options["project"]["name"], project_name)
+        self.assertEqual(captured_project_name, project_name)
+
+
+    def test_an_invalid_domain_is_not_accepted(self):
+        options = Options()
+        invalid_domain = "invalid domain.com"
+        max_tries = 3
+
+        with suppressed_stdout(), send_input(f"{invalid_domain}\n" * max_tries):
+            self.assertRaises(ValueError, options._ask_for_domain_name)
+
+
+    def test_a_valid_domain_name_is_accepted(self):
+        options = Options()
+        domain = "application.local"
+
+        with suppressed_stdout(), send_input(domain):
+            captured_domain = options._ask_for_domain_name()
+
+        self.assertEqual(captured_domain, domain)
+
+
+    def test_a_null_value_defaults_to_the_provided_domain(self):
+        options = Options()
+        domain = "admin.application.local"
+        options.options["project"]["domain"] = domain
+
+        with suppressed_stdout(), send_input("\n"):
+            captured_domain = options._ask_for_domain_name()
+
+        self.assertEqual(captured_domain, domain)

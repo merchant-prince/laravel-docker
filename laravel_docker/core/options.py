@@ -8,7 +8,7 @@ class Options:
         self.options = {
             "project": {
                 "name": None,
-                "domain": None
+                "domain": "application.local"
             },
             "environment": {
                 "uid": os.geteuid(),
@@ -23,8 +23,8 @@ class Options:
 
 
     def get(self):
-        self._ask_for_project_name()
-        self._ask_for_domain_name()
+        self.options["project"]["name"] = self._ask_for_project_name()
+        self.options["project"]["domain"] = self._ask_for_domain_name()
         self._ask_for_database_configuration()
 
         return self.options
@@ -32,7 +32,7 @@ class Options:
 
     def _ask_for_project_name(self):
 
-        project_name = str(Question(
+        return str(Question(
             "Enter the project name: ",
             [
                 lambda n: n if bool(re.match('^[A-Z][a-z]+(?:[A-Z][a-z]+)*$', n)) else ValueError("The project name is not PascalCased."),
@@ -40,11 +40,26 @@ class Options:
             ]
         ))
 
-        self.options["project"]["name"] = project_name
-
 
     def _ask_for_domain_name(self):
-        pass
+        url_regex = re.compile(
+            r'^(?:http|ftp)s?://' # http:// or https://
+            r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|' #domain...
+            r'localhost|' #localhost...
+            r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})' # ...or ip
+            r'(?::\d+)?' # optional port
+            r'(?:/?|[/?]\S+)$',
+            re.IGNORECASE
+        )
+
+        domain = str(Question(
+            f"Enter the project domain [default: '{self.options['project']['domain']}']: ",
+            [
+                lambda domain: domain if domain == '' or re.match(url_regex, f"http://{domain}") is not None else ValueError(f"The domain '{domain}' is invalid.")
+            ]
+        ))
+
+        return domain if domain != '' else self.options["project"]["domain"]
 
 
     def _ask_for_database_configuration(self):

@@ -1,7 +1,7 @@
 from io import StringIO
-import tests.utils as utils
 from unittest import TestCase
 from laravel_docker.helpers.query import Question
+from tests.utils import suppressed_stdout, send_input
 
 
 class TestQuestion(TestCase):
@@ -11,7 +11,7 @@ class TestQuestion(TestCase):
         question_string = "What is your name?"
         answer = "Harivansh"
 
-        with utils.suppressed_stdout() as stdout, utils.send_input(answer):
+        with suppressed_stdout() as stdout, send_input(answer):
             Question(question_string)
 
         self.assertTrue(question_string in stdout.getvalue())
@@ -41,7 +41,7 @@ class TestQuestion(TestCase):
         }
         answer = "Answer"
 
-        with utils.suppressed_stdout() as stdout, utils.send_input(f"{wrong_answer['bad_length']}\n{wrong_answer['wrong_type']}\n{answer}"):
+        with suppressed_stdout() as stdout, send_input(f"{wrong_answer['bad_length']}\n{wrong_answer['wrong_type']}\n{answer}"):
             Question(question_string, validators)
 
         output = stdout.getvalue()
@@ -57,7 +57,7 @@ class TestQuestion(TestCase):
         max_tries = 5
 
         try:
-            with utils.suppressed_stdout(), utils.send_input(f"{wrong_answer}\n" * max_tries):
+            with suppressed_stdout(), send_input(f"{wrong_answer}\n" * max_tries):
                 Question(question_string, validators, max_tries)
         except ValueError:
             self.assertTrue(True)
