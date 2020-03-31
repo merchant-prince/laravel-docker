@@ -5,7 +5,7 @@ from contextlib import contextmanager
 
 
 @contextmanager
-def suppress_stdout():
+def suppressed_stdout():
     """
     Supress stdout in the current context, and redirect it to another buffer.
     This buffer is available in the "as" buffer of the associated context

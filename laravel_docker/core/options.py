@@ -7,18 +7,30 @@ class Options:
     def __init__(self):
         self.options = {
             "project": {
-                "name": None
+                "name": None,
+                "domain": None
+            },
+            "environment": {
+                "uid": os.geteuid(),
+                "gid": os.getegid()
+            },
+            "database": {
+                "name": None,
+                "user": None,
+                "password": None
             }
         }
 
 
     def get(self):
-        self._ask_project_name()
+        self._ask_for_project_name()
+        self._ask_for_domain_name()
+        self._ask_for_database_configuration()
 
         return self.options
 
 
-    def _ask_project_name(self):
+    def _ask_for_project_name(self):
 
         project_name = str(Question(
             "Enter the project name: ",
@@ -29,3 +41,11 @@ class Options:
         ))
 
         self.options["project"]["name"] = project_name
+
+
+    def _ask_for_domain_name(self):
+        pass
+
+
+    def _ask_for_database_configuration(self):
+        pass
