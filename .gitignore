@@ -1,2 +1,10 @@
 .venv/
 .vscode/
+
+laravel_docker/__pycache__/
+laravel_docker/core/__pycache__/
+laravel_docker/helpers/__pycache__/
+
+tests/__pycache__/
+tests/laravel_docker/__pycache__/
+tests/laravel_docker/helpers/__pycache__/
