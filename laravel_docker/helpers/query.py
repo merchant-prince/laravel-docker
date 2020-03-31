@@ -1,3 +1,6 @@
+from scripting_utilities.print import Print
+
+
 class Question:
     """
     This class is used to ask questions to the user.
@@ -7,7 +10,7 @@ class Question:
             The question to ask.
             e.g.: "What is your name?"
 
-        validator (callable):
+        validators ([callable]):
             The validation function. This is normally a lambda function which
             returns a ValueError when the validation fails, and the answer
             otherwise.
@@ -22,39 +25,46 @@ class Question:
     """
 
 
-    def __init__(self, question, validator = lambda a: a, max_tries = 3):
+    def __init__(self, question, validators = [lambda a: a], max_tries = 3):
         self.question = question
         self.max_tries = max_tries
         self.answer = None
 
-        if not callable(validator):
-            raise ValueError("The validator provided is not a callable.")
+        for validator in validators:
+            if not callable(validator):
+                raise ValueError("One of the validators provided is not a callable.")
 
-        self.validator = validator
+        self.validators = validators
+
+        self._ask()
 
 
-    def ask(self):
+    def _ask(self):
         """
         Ask the question to the user.
-
-        Returns:
-            str: The answer entered by the user.
         """
 
         for try_count in range(0, self.max_tries):
             answer = input(f"{self.question} ({try_count}/{self.max_tries}): ")
 
             try:
-                validated_answer = self.validator(answer)
+                for validator in self.validators:
+                    validated_answer = validator(answer)
 
-                if isinstance(validated_answer, ValueError):
-                    raise validated_answer
+                    if isinstance(validated_answer, ValueError):
+                        raise validated_answer
+
+                self.answer = validated_answer
             except ValueError as exception:
-                print(exception)
+                Print.eol()
+                Print.warning(exception)
+                Print.eol(2)
                 continue
             else:
                 break
         else:
-            raise ValueError("You entered the wrong input too many times.")
+            raise ValueError("You have entered the wrong input too many times.")
 
-        return str(self)
+
+    def __str__(self):
+        return self.answer
