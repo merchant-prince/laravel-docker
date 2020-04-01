@@ -1,5 +1,7 @@
+import os
 from unittest import TestCase
 import laravel_docker.helpers.validation as validators
+from scripting_utilities.cd import ChangeDirectory
 
 
 class TestValidators(TestCase):
@@ -69,3 +71,33 @@ class TestValidators(TestCase):
         length = 10
         value = "a" * (length + 1)
         self.assertRaises(ValueError, validators.max_length(length), value)
+
+
+    def test_a_value_is_not_accepted_if_the_cwd_contains_a_directory_with_the_same_name(self):
+        project_name = "TheAwesomeProjectTest"
+
+        with ChangeDirectory("/tmp"):
+            try:
+                os.mkdir(project_name)
+                self.assertRaises(ValueError, validators.directory_does_not_exist, project_name)
+            finally:
+                os.rmdir(project_name)
+
+
+    def test_a_value_is_accepted_if_the_cwd_does_not_contain_a_directory_with_the_same_name(self):
+        project_name = "TheAwesomeProjectThatDoesNotExistTest"
+
+        with ChangeDirectory("/tmp"):
+            validators.directory_does_not_exist(project_name)
+
+
+    def test_a_correctly_formatted_url_is_accepted(self):
+        url = "application.local"
+
+        validators.is_url(url)
+
+
+    def test_an_incorrect_url_is_not_accepted(self):
+        bad_url = "bad url.test"
+
+        self.assertRaises(ValueError, validators.is_url, bad_url)
