@@ -3,9 +3,9 @@ import re
 from laravel_docker.helpers import Question, Validation
 
 
-class Options:
+class Configuration:
     def __init__(self):
-        self.options = {
+        self._configuration = {
             "project": {
                 "name": None,
                 "domain": "application.local"
@@ -22,15 +22,29 @@ class Options:
         }
 
 
+    def initialize(self):
+        """
+        Initialize the configuration dictionary. This is done by asking the
+        user a few questions concerning the configuration options of the
+        project.
+        """
+
+        self._configuration["project"]["name"] = self._ask_for_project_name()
+        self._configuration["project"]["domain"] = self._ask_for_domain_name()
+
+        self._configuration["database"]["name"] = self._ask_for_database_name()
+        self._configuration["database"]["username"] = self._ask_for_database_username()
+        self._configuration["database"]["password"] = self._ask_for_database_password()
+
+
     def get(self):
-        self.options["project"]["name"] = self._ask_for_project_name()
-        self.options["project"]["domain"] = self._ask_for_domain_name()
+        """
+        Get the current instance of the configuration dictionary.
 
-        self.options["database"]["name"] = self._ask_for_database_name()
-        self.options["database"]["username"] = self._ask_for_database_username()
-        self.options["database"]["password"] = self._ask_for_database_password()
-
-        return self.options
+        Returns:
+            dict: The current configuration instance.
+        """
+        return self._configuration
 
 
     def _ask_for_project_name(self):
@@ -45,31 +59,31 @@ class Options:
 
     def _ask_for_domain_name(self):
         return str(Question(
-            f"Enter the project domain [{self.options['project']['domain']}]: ",
+            f"Enter the project domain [{self._configuration['project']['domain']}]: ",
             [Validation.is_url],
-            self.options["project"]["domain"]
+            self._configuration["project"]["domain"]
         ))
 
 
     def _ask_for_database_name(self):
         return str(Question(
-            f"Enter the database name [{self.options['database']['name']}]: ",
+            f"Enter the database name [{self._configuration['database']['name']}]: ",
             [lambda n: n == '' or (Validation.is_alphabetic(n) and Validation.min_length(5)(n))],
-            self.options["database"]["name"]
+            self._configuration["database"]["name"]
         ))
 
 
     def _ask_for_database_username(self):
         return str(Question(
-            f"Enter the database name [{self.options['database']['username']}]: ",
+            f"Enter the database name [{self._configuration['database']['username']}]: ",
             [lambda n: n == '' or (Validation.is_alphabetic(n) and Validation.min_length(5)(n))],
-            self.options["database"]["username"]
+            self._configuration["database"]["username"]
         ))
 
 
     def _ask_for_database_password(self):
         return str(Question(
-            f"Enter the database name [{self.options['database']['password']}]: ",
+            f"Enter the database name [{self._configuration['database']['password']}]: ",
             [lambda n: n == '' or (Validation.is_alphabetic(n) and Validation.min_length(5)(n))],
-            self.options["database"]["password"]
+            self._configuration["database"]["password"]
         ))

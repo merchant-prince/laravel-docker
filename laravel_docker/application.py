@@ -1,5 +1,5 @@
-from laravel_docker.getters import Options
 from scripting_utilities.print import Print
+from laravel_docker.getters import Configuration
 
 
 class Application:
@@ -10,9 +10,12 @@ class Application:
         Print.info("Setting up a new Laravel project.")
         Print.eol(2)
 
-        self.options = None
+        self.configuration = None
 
 
     def run(self):
-        options = Options()
-        self.options = options.get()
+        configuration = Configuration()
+
+        configuration.initialize()
+
+        self.configuration = configuration.get()
