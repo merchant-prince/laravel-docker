@@ -1,9 +1,12 @@
 import os
 import re
 from laravel_docker.helpers import Question, Validation
+from scripting_utilities.skeleton import CreateSkeleton
 
 
-class Configuration:
+class ProjectConfiguration:
+
+
     def __init__(self):
         self._configuration = {
             "project": {
@@ -44,6 +47,7 @@ class Configuration:
         Returns:
             dict: The current configuration instance.
         """
+
         return self._configuration
 
 
@@ -90,3 +94,12 @@ class Configuration:
             [Validation.min_length(5)],
             self._configuration["database"]["password"]
         ))
+
+
+
+
+class Structure:
+
+
+    def __init__(self, structure):
+        CreateSkeleton(structure)

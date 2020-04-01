@@ -1,5 +1,6 @@
 from scripting_utilities.print import Print
-from laravel_docker.getters import Configuration
+from laravel_docker.core import ProjectConfiguration
+from scripting_utilities.skeleton import CreateSkeleton
 
 
 class Application:
@@ -10,12 +11,41 @@ class Application:
         Print.info("Setting up a new Laravel project.")
         Print.eol(2)
 
-        self.configuration = None
+        self._project_configuration = None
 
 
     def run(self):
-        configuration = Configuration()
+        self._initialize_project_configuration()
 
-        configuration.initialize()
 
-        self.configuration = configuration.get()
+    @property
+    def project_configuration(self):
+        return self._project_configuration
+
+
+    def _initialize_project_configuration(self):
+        project_configuration = ProjectConfiguration()
+
+        project_configuration.initialize()
+
+        self._project_configuration = project_configuration.get()
+
+
+    def _setup_project_structure(self):
+        CreateSkeleton({
+            self.project_configuration["project"]["name"]: {
+                "configuration": {
+                    "nginx": {
+                        "configuration": {}
+                    },
+                    "php": {
+                        "configuration": {},
+                        "supervisor": {}
+                    },
+                },
+                "dockerfiles": {
+                    "php": {}
+                },
+                "application": {}
+            }
+        })
