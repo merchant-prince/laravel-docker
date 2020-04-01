@@ -139,19 +139,6 @@ class TestValidators(TestCase):
         self.assertRaises(ValueError, Validation.min_length(length), value)
 
 
-    def test_a_string_shorter_than_the_maximum_length_specified_is_accepted(self):
-        length = 10
-        value = "z" * (length - 1)
-        validator = Validation.max_length(length)
-        validator(value)
-
-
-    def test_a_string_longer_than_the_maximum_length_specified_is_not_accepted(self):
-        length = 10
-        value = "a" * (length + 1)
-        self.assertRaises(ValueError, Validation.max_length(length), value)
-
-
     def test_a_value_is_not_accepted_if_the_cwd_contains_a_directory_with_the_same_name(self):
         project_name = "TheAwesomeProjectTest"
 

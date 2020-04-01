@@ -80,38 +80,114 @@ class TestConfiguration(TestCase):
         self.assertEqual(captured_domain, domain)
 
 
-    def test_a_database_name_shorter_than_the_specified_length_is_not_accepted(self):
-        pass
+    def test_a_database_name_shorter_than_5_characters_is_not_accepted(self):
+        configuration = Configuration()
+        database_name = {
+            "wrong": "name",
+            "correct": "database"
+        }
+
+        with helpers.suppressed_stdout(), helpers.send_input(f"{database_name['wrong']}\n{database_name['correct']}"):
+            configuration._ask_for_database_name()
+
+        self.assertNotEqual(configuration.get()["database"]["name"], database_name["wrong"])
+
 
     def test_a_database_name_consisting_of_any_character_other_than_lowercase_alphabet_is_not_accepted(self):
-        pass
+        configuration = Configuration()
+        database_name = {
+            "wrong": "WrongDbName223",
+            "correct": "database"
+        }
+
+        with helpers.suppressed_stdout(), helpers.send_input(f"{database_name['wrong']}\n{database_name['correct']}"):
+            configuration._ask_for_database_name()
+
+        self.assertNotEqual(configuration.get()["database"]["name"], database_name["wrong"])
+
+
 
     def test_when_a_null_value_is_provided_to_the_database_name_it_defaults_to_the_provided_database_name(self):
-        pass
+        configuration = Configuration()
+        default_answer = "databasename"
+        configuration._configuration["database"]["name"] = default_answer
+        answer = "\n"
+
+        with helpers.suppressed_stdout(), helpers.send_input(answer):
+            configuration._ask_for_database_name()
+
+        self.assertEqual(configuration.get()["database"]["name"], default_answer)
+
 
     def test_a_database_name_of_the_specified_length_consisting_of_lowercase_alphabets_only_is_accepted(self):
-        pass
+        configuration = Configuration()
+        answer = "databasename"
 
-    # def test_a_database_name_shorter_than_the_specified_length_is_not_accepted(self):
-    #     pass
+        with helpers.suppressed_stdout(), helpers.send_input(answer):
+            configuration._ask_for_database_name()
 
-    # def test_a_database_name_consisting_of_any_character_other_than_lowercase_alphabet_is_not_accepted(self):
-    #     pass
 
-    # def test_when_a_null_value_is_provided_to_the_database_name_it_defaults_to_the_provided_database_name(self):
-    #     pass
+    def test_a_database_username_shorter_than_5_characters_is_not_accepted(self):
+        configuration = Configuration()
+        database_username = {
+            "wrong": "name",
+            "correct": "username"
+        }
 
-    # def test_a_database_name_of_the_specified_length_consisting_of_lowercase_alphabets_only_is_accepted(self):
-    #     pass
+        with helpers.suppressed_stdout(), helpers.send_input(f"{database_username['wrong']}\n{database_username['correct']}"):
+            configuration._ask_for_database_username()
 
-    # def test_a_database_name_shorter_than_the_specified_length_is_not_accepted(self):
-    #     pass
+        self.assertNotEqual(configuration.get()["database"]["username"], database_username["wrong"])
 
-    # def test_a_database_name_consisting_of_any_character_other_than_lowercase_alphabet_is_not_accepted(self):
-    #     pass
 
-    # def test_when_a_null_value_is_provided_to_the_database_name_it_defaults_to_the_provided_database_name(self):
-    #     pass
+    def test_when_a_null_value_is_provided_to_the_database_username_it_defaults_to_the_provided_database_username(self):
+        configuration = Configuration()
+        default_answer = "username"
+        configuration._configuration["database"]["username"] = default_answer
+        answer = "\n"
 
-    # def test_a_database_name_of_the_specified_length_consisting_of_lowercase_alphabets_only_is_accepted(self):
-    #     pass
+        with helpers.suppressed_stdout(), helpers.send_input(answer):
+            configuration._ask_for_database_username()
+
+        self.assertEqual(configuration.get()["database"]["username"], default_answer)
+
+
+    def test_a_database_username_of_the_specified_length_consisting_of_lowercase_alphabets_only_is_accepted(self):
+        configuration = Configuration()
+        answer = "username"
+
+        with helpers.suppressed_stdout(), helpers.send_input(answer):
+            configuration._ask_for_database_username()
+
+
+    def test_a_database_password_shorter_than_5_characters_is_not_accepted(self):
+        configuration = Configuration()
+        database_password = {
+            "wrong": "lepass",
+            "correct": "password"
+        }
+
+        with helpers.suppressed_stdout(), helpers.send_input(f"{database_password['wrong']}\n{database_password['correct']}"):
+            configuration._ask_for_database_password()
+
+        self.assertNotEqual(configuration.get()["database"]["name"], database_password["wrong"])
+
+
+    def test_when_a_null_value_is_provided_to_the_database_password_it_defaults_to_the_provided_database_password(self):
+        configuration = Configuration()
+        default_answer = "password"
+        configuration._configuration["database"]["password"] = default_answer
+        answer = "\n"
+
+        with helpers.suppressed_stdout(), helpers.send_input(answer):
+            configuration._ask_for_database_password()
+
+        self.assertEqual(configuration.get()["database"]["password"], default_answer)
+
+
+    def test_a_database_password_of_the_specified_length_consisting_of_lowercase_alphabets_only_is_accepted(self):
+        configuration = Configuration()
+        answer = "password"
+
+        with helpers.suppressed_stdout(), helpers.send_input(answer):
+            configuration._ask_for_database_password()

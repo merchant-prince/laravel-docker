@@ -68,7 +68,10 @@ class Configuration:
     def _ask_for_database_name(self):
         return str(Question(
             f"Enter the database name [{self._configuration['database']['name']}]: ",
-            [lambda n: n == '' or (Validation.is_alphabetic(n) and Validation.min_length(5)(n))],
+            [
+                Validation.is_alphabetic,
+                Validation.min_length(5)
+            ],
             self._configuration["database"]["name"]
         ))
 
@@ -76,7 +79,7 @@ class Configuration:
     def _ask_for_database_username(self):
         return str(Question(
             f"Enter the database name [{self._configuration['database']['username']}]: ",
-            [lambda n: n == '' or (Validation.is_alphabetic(n) and Validation.min_length(5)(n))],
+            [Validation.min_length(5)],
             self._configuration["database"]["username"]
         ))
 
@@ -84,6 +87,6 @@ class Configuration:
     def _ask_for_database_password(self):
         return str(Question(
             f"Enter the database name [{self._configuration['database']['password']}]: ",
-            [lambda n: n == '' or (Validation.is_alphabetic(n) and Validation.min_length(5)(n))],
+            [Validation.min_length(5)],
             self._configuration["database"]["password"]
         ))

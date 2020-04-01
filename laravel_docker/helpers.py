@@ -145,12 +145,3 @@ class Validation:
                 raise ValueError(f"The provided value should be longer than {length} characters.")
 
         return minimum_length_validator
-
-
-    @staticmethod
-    def max_length(length):
-        def maximum_length_validator(value):
-            if len(value) > length:
-                raise ValueError(f"The provided value should not be longer than {length} characters.")
-
-        return maximum_length_validator
