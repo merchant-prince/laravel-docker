@@ -1,8 +1,8 @@
 import os
 from unittest import TestCase
-from laravel_docker.core.options import Options
+import tests.helpers as helpers
+from laravel_docker.getters import Options
 from scripting_utilities.cd import ChangeDirectory
-from tests.utils import suppressed_stdout, send_input
 
 
 class TestOptions(TestCase):
@@ -20,7 +20,7 @@ class TestOptions(TestCase):
         project_name = "project-one"
         max_tries = 3
 
-        with suppressed_stdout(), send_input(f"{project_name}\n" * max_tries):
+        with helpers.suppressed_stdout(), helpers.send_input(f"{project_name}\n" * max_tries):
             self.assertRaises(ValueError, options._ask_for_project_name)
 
 
@@ -34,7 +34,7 @@ class TestOptions(TestCase):
                 options = Options()
                 max_tries = 3
 
-                with suppressed_stdout(), send_input(f"{project_name}\n" * max_tries):
+                with helpers.suppressed_stdout(), helpers.send_input(f"{project_name}\n" * max_tries):
                     self.assertRaises(ValueError, options._ask_for_project_name)
             finally:
                 os.rmdir(project_name)
@@ -44,7 +44,7 @@ class TestOptions(TestCase):
         options = Options()
         project_name = "CorrectProjectName"
 
-        with suppressed_stdout(), send_input(project_name):
+        with helpers.suppressed_stdout(), helpers.send_input(project_name):
             captured_project_name = options._ask_for_project_name()
 
         self.assertEqual(captured_project_name, project_name)
@@ -55,7 +55,7 @@ class TestOptions(TestCase):
         invalid_domain = "invalid domain.com"
         max_tries = 3
 
-        with suppressed_stdout(), send_input(f"{invalid_domain}\n" * max_tries):
+        with helpers.suppressed_stdout(), helpers.send_input(f"{invalid_domain}\n" * max_tries):
             self.assertRaises(ValueError, options._ask_for_domain_name)
 
 
@@ -63,7 +63,7 @@ class TestOptions(TestCase):
         options = Options()
         domain = "application.local"
 
-        with suppressed_stdout(), send_input(domain):
+        with helpers.suppressed_stdout(), helpers.send_input(domain):
             captured_domain = options._ask_for_domain_name()
 
         self.assertEqual(captured_domain, domain)
@@ -74,7 +74,7 @@ class TestOptions(TestCase):
         domain = "admin.application.local"
         options.options["project"]["domain"] = domain
 
-        with suppressed_stdout(), send_input("\n"):
+        with helpers.suppressed_stdout(), helpers.send_input("\n"):
             captured_domain = options._ask_for_domain_name()
 
         self.assertEqual(captured_domain, domain)

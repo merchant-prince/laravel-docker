@@ -1,7 +1,6 @@
 import os
 import re
-from laravel_docker.helpers.query import Question
-import laravel_docker.helpers.validation as validators
+from laravel_docker.helpers import Question, Validation
 
 
 class Options:
@@ -38,8 +37,8 @@ class Options:
         return str(Question(
             "Enter the project name: ",
             [
-                validators.is_pascalcased,
-                validators.directory_does_not_exist
+                Validation.is_pascalcased,
+                Validation.directory_existence
             ]
         ))
 
@@ -47,7 +46,7 @@ class Options:
     def _ask_for_domain_name(self):
         return str(Question(
             f"Enter the project domain [{self.options['project']['domain']}]: ",
-            [validators.is_url],
+            [Validation.is_url],
             self.options["project"]["domain"]
         ))
 
@@ -55,7 +54,7 @@ class Options:
     def _ask_for_database_name(self):
         return str(Question(
             f"Enter the database name [{self.options['database']['name']}]: ",
-            [lambda n: n == '' or (validators.is_alphabetic(n) and validators.min_length(5)(n))],
+            [lambda n: n == '' or (Validation.is_alphabetic(n) and Validation.min_length(5)(n))],
             self.options["database"]["name"]
         ))
 
@@ -63,7 +62,7 @@ class Options:
     def _ask_for_database_username(self):
         return str(Question(
             f"Enter the database name [{self.options['database']['username']}]: ",
-            [lambda n: n == '' or (validators.is_alphabetic(n) and validators.min_length(5)(n))],
+            [lambda n: n == '' or (Validation.is_alphabetic(n) and Validation.min_length(5)(n))],
             self.options["database"]["username"]
         ))
 
@@ -71,6 +70,6 @@ class Options:
     def _ask_for_database_password(self):
         return str(Question(
             f"Enter the database name [{self.options['database']['password']}]: ",
-            [lambda n: n == '' or (validators.is_alphabetic(n) and validators.min_length(5)(n))],
+            [lambda n: n == '' or (Validation.is_alphabetic(n) and Validation.min_length(5)(n))],
             self.options["database"]["password"]
         ))
