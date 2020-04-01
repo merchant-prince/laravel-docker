@@ -41,3 +41,11 @@ def send_input(value):
         yield
     finally:
         sys.stdin = original_stdin
+
+
+def raise_exception(exception):
+    """
+    This function is used to raise exceptions in lambdas.
+    """
+
+    raise exception

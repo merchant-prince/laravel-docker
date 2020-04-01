@@ -78,3 +78,16 @@ class TestOptions(TestCase):
             captured_domain = options._ask_for_domain_name()
 
         self.assertEqual(captured_domain, domain)
+
+
+    def test_a_database_name_shorter_than_the_specified_length_is_not_accepted(self):
+        pass
+
+    def test_a_database_name_consisting_of_any_character_other_than_lowercase_alphabet_is_not_accepted(self):
+        pass
+
+    def test_when_a_null_value_is_provided_to_the_database_name_it_defaults_to_the_provided_database_name(self):
+        pass
+
+    def test_a_database_name_of_the_specified_length_consisting_of_lowercase_alphabets_only_is_accepted(self):
+        pass

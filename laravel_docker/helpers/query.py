@@ -16,6 +16,10 @@ class Question:
             otherwise.
             e.g.: lambda a: a if len(a) < 33 else ValueError("Oops...")
 
+        default_answer (str):
+            The default answer to the question. This is used if the user enters
+            an EOL as the first character to the question.
+
         max_tries (int):
             The maximum number of times to try a question if its validation
             fails.
@@ -25,9 +29,10 @@ class Question:
     """
 
 
-    def __init__(self, question, validators = [lambda a: a], max_tries = 3):
+    def __init__(self, question, validators = [lambda a: a], default_answer = None, max_tries = 3):
         self.question = question
         self.max_tries = max_tries
+        self.default_answer = default_answer
         self.answer = None
 
         for validator in validators:
@@ -47,18 +52,19 @@ class Question:
         for try_count in range(0, self.max_tries):
             answer = input(self.question)
 
+            if answer == '' and self.default_answer is not None:
+                answer = self.default_answer
+
             try:
                 for validator in self.validators:
-                    validated_answer = validator(answer)
+                    validator(answer)
 
-                    if isinstance(validated_answer, ValueError):
-                        raise validated_answer
-
-                self.answer = validated_answer
+                self.answer = answer
             except ValueError as exception:
                 Print.eol()
                 Print.warning(exception)
                 Print.eol(2)
+
                 continue
             else:
                 break
