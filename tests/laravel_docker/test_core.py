@@ -1,7 +1,7 @@
 import os
 from unittest import TestCase
 import tests.helpers as helpers
-from laravel_docker.core import ProjectConfiguration
+from laravel_docker.core import ProjectConfiguration, Parse
 from scripting_utilities.cd import ChangeDirectory
 
 
@@ -191,3 +191,37 @@ class TestProjectConfiguration(TestCase):
 
         with helpers.suppressed_stdout(), helpers.send_input(answer):
             project_configuration._ask_for_database_password()
+
+
+
+
+class TestParse(TestCase):
+
+
+    def test_a_template_string_with_the_correct_delimiters_is_successfully_parsed(self):
+        template = "The project's name is [[PROJECT_NAME]], and it was written by the user [[USER_NAME]]."
+        variables = {
+            "PROJECT_NAME": "Laravel One",
+            "USER_NAME": "Harivansh"
+        }
+        parsed_template = str(Parse(variables, template))
+        expected_parsed_template = "The project's name is Laravel One, and it was written by the user Harivansh."
+
+        self.assertEqual(parsed_template, expected_parsed_template)
+
+
+    def test_a_template_with_no_delimiters_returns_the_template_string_as_is(self):
+        template = "The project's name is Laravel One, and it was written by the user Harivansh."
+        parsed_template = str(Parse({}, template))
+        expected_parsed_template = "The project's name is Laravel One, and it was written by the user Harivansh."
+
+        self.assertEqual(parsed_template, expected_parsed_template)
+
+
+    def test_a_template_with_unparsed_variables_will_raise_an_error(self):
+        template = "The project's name is [[PROJECT_NAME]], and it was written by the user [[USER_NAME]]."
+        variables = {
+            "PROJECT_NAME": "Laravel One"
+        }
+
+        self.assertRaises(ValueError, Parse, variables, template)

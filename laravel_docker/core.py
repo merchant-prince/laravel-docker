@@ -98,8 +98,23 @@ class ProjectConfiguration:
 
 
 
-class Structure:
+class Parse:
 
 
-    def __init__(self, structure):
-        CreateSkeleton(structure)
+    TEMPLATE_DELIMITERS = "[[{}]]"
+
+
+    def __init__(self, variables, template):
+        parsed_template = template
+
+        for name, value in variables.items():
+            parsed_template = parsed_template.replace(Parse.TEMPLATE_DELIMITERS.format(name), value)
+
+        self._parsed_template = parsed_template
+
+        if re.match(r'.*\[\[[A-Z][A-Z0-9_]+\]\].*', self._parsed_template) is not None:
+            raise ValueError("There are still unparsed variables in the template.")
+
+
+    def __str__(self):
+        return self._parsed_template
