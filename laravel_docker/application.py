@@ -16,6 +16,7 @@ class Application:
 
     def run(self):
         self._initialize_project_configuration()
+        self._setup_project_structure()
 
 
     @property
@@ -35,11 +36,8 @@ class Application:
         CreateSkeleton({
             self.project_configuration["project"]["name"]: {
                 "configuration": {
-                    "nginx": {
-                        "configuration": {}
-                    },
+                    "nginx": {},
                     "php": {
-                        "configuration": {},
                         "supervisor": {}
                     },
                 },
@@ -49,3 +47,7 @@ class Application:
                 "application": {}
             }
         })
+
+
+    def _add_project_structure_files(self):
+        pass
