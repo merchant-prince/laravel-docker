@@ -1,7 +1,9 @@
-FROM php:fpm
+ARG PHP_FPM_IMAGE_TAG
+
+FROM php:${PHP_FPM_IMAGE_TAG}
 
 RUN apt-get update \
- && apt-get install -y cron composer sudo supervisor zip libpq-dev libzip-dev \
+ && apt-get install -y cron zip libpq-dev libzip-dev \
  && docker-php-ext-install bcmath pdo_pgsql pgsql pcntl zip \
  && docker-php-ext-configure pgsql \
  && docker-php-ext-configure zip \
@@ -35,13 +37,14 @@ RUN userdel -f www-data && \
           ${USER_ID}:${GROUP_ID} \
           /home/www-data
 
-# Setup privileges for www-data to start cron
-# @todo: add more restrictive perms
-RUN echo "www-data ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+RUN touch /var/log/www-data.cron.log \
+ && chown www-data:www-data /var/log/www-data.cron.log \
+ && echo "* * * * *    www-data    php /var/www/html/artisan schedule:run >> /var/log/www-data.cron.log 2>&1" >> /etc/crontab
 
-VOLUME [ "${PHP_INI_DIR}", "/etc/crontab", "/var/www/html" ]
+VOLUME [ "/var/www/html" ]
 
-USER www-data
+COPY entrypoint.sh /home/www-data/custom-entrypoint.sh
 
-# @todo: use gosu instead
-CMD ["sudo", "/usr/bin/supervisord", "--configuration", "/etc/supervisor/conf.d/supervisord.conf"]
+ENTRYPOINT [ "/home/www-data/custom-entrypoint.sh" ]
+
+CMD [ "php-fpm" ]

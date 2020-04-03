@@ -107,7 +107,7 @@ class Parser:
         parsed_template = self._raw_template_string
 
         for name, value in variables.items():
-            parsed_template = parsed_template.replace(delimiters_creator(name), value)
+            parsed_template = parsed_template.replace(delimiters_creator(name), str(value))
 
         if re.match(r'.*\[\[[A-Z][A-Z0-9_]+\]\].*', parsed_template) is not None:
             raise ValueError("There are still unparsed variables in the template.")

@@ -40,17 +40,12 @@ class Application:
         CreateSkeleton({
             self.project_configuration["project"]["name"]: {
                 "configuration": {
-                    "nginx": {},
-                    "php": {
-                        "supervisor": {}
-                    },
+                    "nginx": {}
                 },
                 "dockerfiles": {
                     "php": {}
                 },
-                "application": {
-                    ".gitkeep": ""
-                }
+                "application": {}
             }
         })
 
@@ -66,53 +61,46 @@ class Application:
                              })
                              .output("nginx.conf"))
 
-                with ChangeDirectory("php"):
-                    # crontab
-                    (Parser().read_template(Parser.template_path("configuration/php/crontab"))
-                             .parse()
-                             .output("crontab"))
-
-                    # supervisord.conf
-                    #@TODO: REVIEW THE SUPERVISORD DOCS
-                    with ChangeDirectory("supervisor"):
-                        (Parser().read_template(Parser.template_path("configuration/php/supervisor/supervisord.conf"))
-                                 .parse()
-                                 .output("supervisord.conf"))
-
             with ChangeDirectory("dockerfiles"):
-                # PHP Dockerfile
                 with ChangeDirectory("php"):
+                    # PHP Dockerfile
                     (Parser().read_template(Parser.template_path("dockerfiles/php/Dockerfile"))
                              .parse()
                              .output("Dockerfile"))
 
+                    # entrypoint.sh
+                    (Parser().read_template(Parser.template_path("dockerfiles/php/entrypoint.sh"))
+                             .parse()
+                             .output("entrypoint.sh"))
+
+                    os.chmod("entrypoint.sh", os.stat("entrypoint.sh").st_mode | stat.S_IEXEC)
+
             # docker-compose.yml
-            (Parser().read_template(Parser.template_path("docker-composer.yml"))
+            (Parser().read_template(Parser.template_path("docker-compose.yml"))
                      .parse()
-                     .output("docker-composer.yml"))
+                     .output("docker-compose.yml"))
+
+            environment_variables = {
+                "PROJECT_NAME": self.project_configuration["project"]["name"],
+                "USER_ID": self.project_configuration["environment"]["uid"],
+                "GROUP_ID": self.project_configuration["environment"]["gid"]
+            }
 
             # .env (for docker-compose)
             (Parser().read_template(Parser.template_path("project.env"))
-                     .parse({
-                         "PROJECT_NAME": self.project_configuration["project"]["name"],
-                         "USER_ID": self.project_configuration["environment"]["uid"],
-                         "GROUP_ID": self.project_configuration["environment"]["gid"]
-                     })
+                     .parse(environment_variables)
                      .output(".env"))
 
             # .env.example
             (Parser().read_template(Parser.template_path("project.env"))
-                     .parse({
-                         "PROJECT_NAME": "",
-                         "USER_ID": "",
-                         "GROUP_ID": ""
-                     })
+                     .parse({ name: "" for name in environment_variables })
                      .output(".env.example"))
 
             # run.py
             (Parser().read_template(Parser.template_path("run.py"))
                      .parse()
                      .output("run.py"))
+
             os.chmod("run.py", os.stat("run.py").st_mode | stat.S_IEXEC)
 
             # .gitignore

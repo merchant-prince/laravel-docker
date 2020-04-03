@@ -9,12 +9,12 @@ from subprocess import run
 
 
 
-def get_project_environment_variables(file_path = ".env"):
+def get_project_environment_variables(file_path):
     environment = {}
 
     with open(file_path) as environment_file:
         for line in environment_file:
-            key, value = line.split("=").strip(' "')
+            key, value = [word.strip('"\n') for word in line.split("=", 1)]
             environment[key] = value
 
     return environment
@@ -23,7 +23,7 @@ def get_project_environment_variables(file_path = ".env"):
 
 
 if __name__ == "__main__":
-    env = get_project_environment_variables()
+    env = get_project_environment_variables(".env")
 
     parser = argparse.ArgumentParser(description = f"Perform common tasks on the {env['PROJECT_NAME']} application stack.")
 
@@ -36,7 +36,13 @@ if __name__ == "__main__":
         run(["docker-compose", "exec", "php", "php", "artisan"] + parsed.arguments)
 
     elif parsed.tool == "composer":
-        run(["docker-compose", "exec", "php", "composer"] + parsed.arguments)
+        run(["docker", "run", "--rm",
+                              "--interactive",
+                              "--tty",
+                              "--user", f"{env['USER_ID']}:{env['GROUP_ID']}",
+                              "--workdir", "/application",
+                              "--mount", f"type=bind,source={os.getcwd()}/application/{env['PROJECT_NAME']},target=/application",
+                              f"composer:{env['COMPOSER_IMAGE_TAG']}"] + parsed.arguments)
 
     elif parsed.tool == "yarn":
         run(["docker", "run", "--rm",
@@ -45,7 +51,7 @@ if __name__ == "__main__":
                               "--user", f"{env['USER_ID']}:{env['GROUP_ID']}",
                               "--workdir", "/application",
                               "--mount", f"type=bind,source={os.getcwd()}/application/{env['PROJECT_NAME']},target=/application",
-                              "node", "yarn"] + parsed.arguments)
+                              f"node:{env['NODE_IMAGE_TAG']}", "yarn"] + parsed.arguments)
 
     elif parsed.tool == "phpunit":
         run(["docker-compose", "exec", "php", "php", "./vendor/bin/phpunit"] + parsed.arguments)
