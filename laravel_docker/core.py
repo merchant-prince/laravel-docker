@@ -17,11 +17,6 @@ class ProjectConfiguration:
             "environment": {
                 "uid": os.geteuid(),
                 "gid": os.getegid()
-            },
-            "database": {
-                "name": "application",
-                "username": "username",
-                "password": "password"
             }
         }
 
@@ -35,10 +30,6 @@ class ProjectConfiguration:
 
         self._configuration["project"]["name"] = self._ask_for_project_name()
         self._configuration["project"]["domain"] = self._ask_for_domain_name()
-
-        self._configuration["database"]["name"] = self._ask_for_database_name()
-        self._configuration["database"]["username"] = self._ask_for_database_username()
-        self._configuration["database"]["password"] = self._ask_for_database_password()
 
 
     def get(self):
@@ -54,7 +45,7 @@ class ProjectConfiguration:
 
     def _ask_for_project_name(self):
         return str(Question(
-            "Enter the project name: ",
+            "Enter the project name",
             [
                 Validation.is_pascalcased,
                 Validation.directory_existence
@@ -64,42 +55,18 @@ class ProjectConfiguration:
 
     def _ask_for_domain_name(self):
         return str(Question(
-            f"Enter the project domain [{self._configuration['project']['domain']}]: ",
+            "Enter the project domain",
             [Validation.is_url],
             self._configuration["project"]["domain"]
-        ))
-
-
-    def _ask_for_database_name(self):
-        return str(Question(
-            f"Enter the database name [{self._configuration['database']['name']}]: ",
-            [
-                Validation.is_alphabetic,
-                Validation.min_length(5)
-            ],
-            self._configuration["database"]["name"]
-        ))
-
-
-    def _ask_for_database_username(self):
-        return str(Question(
-            f"Enter the database name [{self._configuration['database']['username']}]: ",
-            [Validation.min_length(5)],
-            self._configuration["database"]["username"]
-        ))
-
-
-    def _ask_for_database_password(self):
-        return str(Question(
-            f"Enter the database name [{self._configuration['database']['password']}]: ",
-            [Validation.min_length(5)],
-            self._configuration["database"]["password"]
         ))
 
 
 
 
 class Parser:
+
+
+    TEMPLATES_DIRECTORY_PATH = f"{os.path.dirname(os.path.abspath(__file__))}/templates"
 
 
     def __init__(self):
@@ -110,6 +77,11 @@ class Parser:
     @property
     def parsed_template_string(self):
         return self._parsed_template_string
+
+
+    @staticmethod
+    def template_path(path = ""):
+        return f"{Parser.TEMPLATES_DIRECTORY_PATH}/{path.strip('/')}"
 
 
     def read_template(self, template_path):
@@ -125,7 +97,7 @@ class Parser:
         return self
 
 
-    def parse(self,variables, delimiters_creator = lambda variable_name: f"[[{variable_name}]]"):
+    def parse(self,variables = {}, delimiters_creator = lambda variable_name: f"[[{variable_name}]]"):
         if not isinstance(variables, Mapping):
             raise ValueError("The variables argument should be a Mapping (dict).")
 

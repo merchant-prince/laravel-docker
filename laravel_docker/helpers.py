@@ -52,7 +52,7 @@ class Question:
         """
 
         for try_count in range(0, self.max_tries):
-            answer = input(self.question)
+            answer = input(f"{self.question}{f' [{self.default_answer}]' if self.default_answer is not None else ''}: ")
 
             if answer == '' and self.default_answer is not None:
                 answer = self.default_answer

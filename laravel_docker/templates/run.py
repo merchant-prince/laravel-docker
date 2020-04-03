@@ -8,6 +8,7 @@ from subprocess import run
 
 
 if __name__ == "__main__":
+    #@TODO: THIS FILE NEEDS TO DEPEND ON THE .env FILE FOR VARIABLES
     parser = argparse.ArgumentParser(description="Perform common tasks on the [[PROJECT_NAME]] application stack.")
 
     parser.add_argument("tool", help="Define a tool to use on the application stack.", choices=("artisan", "composer", "yarn", "phpunit"))

@@ -1,4 +1,6 @@
 .vscode/
 .idea/
+.env
 
 application/*
+!application/.gitkeep
