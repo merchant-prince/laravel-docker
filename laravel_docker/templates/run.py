@@ -7,9 +7,25 @@ import argparse
 from subprocess import run
 
 
+
+
+def get_project_environment_variables(file_path = ".env"):
+    environment = {}
+
+    with open(file_path) as environment_file:
+        for line in environment_file:
+            key, value = line.split("=").strip(' "')
+            environment[key] = value
+
+    return environment
+
+
+
+
 if __name__ == "__main__":
-    #@TODO: THIS FILE NEEDS TO DEPEND ON THE .env FILE FOR VARIABLES
-    parser = argparse.ArgumentParser(description="Perform common tasks on the [[PROJECT_NAME]] application stack.")
+    env = get_project_environment_variables()
+
+    parser = argparse.ArgumentParser(description = f"Perform common tasks on the {env['PROJECT_NAME']} application stack.")
 
     parser.add_argument("tool", help="Define a tool to use on the application stack.", choices=("artisan", "composer", "yarn", "phpunit"))
     parser.add_argument("arguments", nargs=argparse.REMAINDER, help="Optional arguments to pass to the specified tool.")
@@ -26,9 +42,9 @@ if __name__ == "__main__":
         run(["docker", "run", "--rm",
                               "--interactive",
                               "--tty",
-                              "--user", f"{os.geteuid()}:{os.getegid()}",
+                              "--user", f"{env['USER_ID']}:{env['GROUP_ID']}",
                               "--workdir", "/application",
-                              "--mount", f"type=bind,source={os.getcwd()}/application/[[PROJECT_NAME]],target=/application",
+                              "--mount", f"type=bind,source={os.getcwd()}/application/{env['PROJECT_NAME']},target=/application",
                               "node", "yarn"] + parsed.arguments)
 
     elif parsed.tool == "phpunit":

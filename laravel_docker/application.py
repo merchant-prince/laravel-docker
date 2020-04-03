@@ -1,4 +1,5 @@
 import os
+import stat
 from scripting_utilities.print import Print
 from scripting_utilities.cd import ChangeDirectory
 from scripting_utilities.skeleton import CreateSkeleton
@@ -109,10 +110,10 @@ class Application:
                      .output(".env.example"))
 
             # run.py
-            #@TODO: MAKE THE RUN BINARY EXECUTABLE
             (Parser().read_template(Parser.template_path("run.py"))
                      .parse()
                      .output("run.py"))
+            os.chmod("run.py", os.stat("run.py").st_mode | stat.S_IEXEC)
 
             # .gitignore
             (Parser().read_template(Parser.template_path("project.gitignore"))
