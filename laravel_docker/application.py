@@ -1,6 +1,8 @@
+import os
 from scripting_utilities.print import Print
-from laravel_docker.core import ProjectConfiguration
+from scripting_utilities.cd import ChangeDirectory
 from scripting_utilities.skeleton import CreateSkeleton
+from laravel_docker.core import ProjectConfiguration, Parser
 
 
 class Application:
@@ -12,6 +14,12 @@ class Application:
         Print.eol(2)
 
         self._project_configuration = None
+        self._template_path = os.path.dirname(os.path.abspath(__file__))
+
+
+    @property
+    def project_configuration(self):
+        return self._project_configuration
 
 
     def run(self):
@@ -19,9 +27,8 @@ class Application:
         self._setup_project_structure()
 
 
-    @property
-    def project_configuration(self):
-        return self._project_configuration
+    def template_path(path = ""):
+        return self._template_path + path
 
 
     def _initialize_project_configuration(self):
@@ -50,4 +57,5 @@ class Application:
 
 
     def _add_project_structure_files(self):
-        pass
+        with ChangeDirectory(self.project_configuration["project"]["name"]):
+            pass

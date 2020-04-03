@@ -1,7 +1,9 @@
 import os
+import shutil
+from pathlib import Path
 from unittest import TestCase
 import tests.helpers as helpers
-from laravel_docker.core import ProjectConfiguration, Parse
+from laravel_docker.core import ProjectConfiguration, Parser
 from scripting_utilities.cd import ChangeDirectory
 
 
@@ -195,33 +197,149 @@ class TestProjectConfiguration(TestCase):
 
 
 
-class TestParse(TestCase):
+class TestParser(TestCase):
 
 
-    def test_a_template_string_with_the_correct_delimiters_is_successfully_parsed(self):
-        template = "The project's name is [[PROJECT_NAME]], and it was written by the user [[USER_NAME]]."
+    def test_a_template_is_read(self):
+        project_name = "TheAwesomeProjectWithAnAwesomeName"
+
+        with ChangeDirectory("/tmp"):
+            try:
+                os.mkdir(project_name)
+
+                with ChangeDirectory(project_name):
+                    template_name = "template.txt"
+                    template_string = "This is the template string."
+
+                    with open(template_name, "w") as template:
+                        template.write(template_string)
+
+                    parser = Parser()
+                    parser.read_template(template_name)
+
+                    self.assertEqual(parser._raw_template_string, template_string)
+            finally:
+                shutil.rmtree(project_name)
+
+
+    def test_a_template_string_is_added(self):
+        template_string = "This is the template string."
+        parser = Parser()
+        parser.add_template_string(template_string)
+
+        self.assertEqual(parser._raw_template_string, template_string)
+
+
+    def test_the_parser_variable_not_of_the_mapping_type_will_raise_an_error(self):
+        template_string = "This is the template string."
+        variables = "WRONG VARIABLE TYPE"
+        parser = Parser()
+
+        parser.add_template_string(template_string)
+
+        self.assertRaises(ValueError, parser.parse, variables)
+
+
+    def test_the_parser_delimiters_creator_not_of_the_callable_type_will_raise_an_error(self):
+        template_string = "This is the template string."
+        variables = {}
+        delimiters_creator = "WRONG DELIMITERS CREATOR TYPE"
+        parser = Parser()
+
+        parser.add_template_string(template_string)
+
+        self.assertRaises(ValueError, parser.parse, variables, delimiters_creator)
+
+
+    def test_parser_will_throw_an_error_if_there_are_remaining_variables_in_the_parsed_template(self):
+        template_string = "This is the template string with [[LE_VAR]] and [[MORE_VARS]]."
         variables = {
-            "PROJECT_NAME": "Laravel One",
-            "USER_NAME": "Harivansh"
+            "LE_VAR": "this variable"
         }
-        parsed_template = str(Parse(variables, template))
-        expected_parsed_template = "The project's name is Laravel One, and it was written by the user Harivansh."
+        parser = Parser()
 
-        self.assertEqual(parsed_template, expected_parsed_template)
+        parser.add_template_string(template_string)
 
-
-    def test_a_template_with_no_delimiters_returns_the_template_string_as_is(self):
-        template = "The project's name is Laravel One, and it was written by the user Harivansh."
-        parsed_template = str(Parse({}, template))
-        expected_parsed_template = "The project's name is Laravel One, and it was written by the user Harivansh."
-
-        self.assertEqual(parsed_template, expected_parsed_template)
+        self.assertRaises(ValueError, parser.parse, variables)
 
 
-    def test_a_template_with_unparsed_variables_will_raise_an_error(self):
-        template = "The project's name is [[PROJECT_NAME]], and it was written by the user [[USER_NAME]]."
+    def test_a_template_is_successfully_parsed_with_the_default_delimiters_creator_if_the_correct_variables_mapping_is_provided(self):
+        template_string = "The user's name is [[NAME]] and his email is [[EMAIL]]."
         variables = {
-            "PROJECT_NAME": "Laravel One"
+            "NAME": "Harivansh",
+            "EMAIL": "hello@harivan.sh"
         }
+        expected_parsed_template_string = "The user's name is Harivansh and his email is hello@harivan.sh."
+        parser = Parser()
 
-        self.assertRaises(ValueError, Parse, variables, template)
+        parser.add_template_string(template_string).parse(variables)
+
+        self.assertEqual(parser.parsed_template_string, expected_parsed_template_string)
+
+
+    def test_a_template_is_successfully_parsed_with_a_custom_delimiters_creator_if_the_correct_variables_mapping_is_provided(self):
+        template_string = "The user's name is {{LE_NAME}} and his email is {{LE_EMAIL}}."
+        variables = {
+            "NAME": "Harivansh",
+            "EMAIL": "hello@harivan.sh"
+        }
+        delimiters_creator = lambda n: f"{{{{LE_{n}}}}}"
+        expected_parsed_template_string = "The user's name is Harivansh and his email is hello@harivan.sh."
+        parser = Parser()
+
+        parser.add_template_string(template_string).parse(variables, delimiters_creator)
+
+        self.assertEqual(parser.parsed_template_string, expected_parsed_template_string)
+
+
+    def test_the_output_file_cannot_be_written_to_the_specified_path_if_it_already_exists(self):
+        template_string = "The user's name is [[NAME]] and his email is [[EMAIL]]."
+        variables = {
+            "NAME": "Harivansh",
+            "EMAIL": "hello@harivan.sh"
+        }
+        project_name = "TheAwesomeProjectWithAnAwesomeName"
+        output_filename = "output.txt"
+
+        with ChangeDirectory("/tmp"):
+            try:
+                os.mkdir(project_name)
+
+                with ChangeDirectory(project_name):
+                    Path(output_filename).touch()
+
+                    parser = Parser()
+
+                    parser.add_template_string(template_string).parse(variables)
+
+                    self.assertRaises(ValueError, parser.output, output_filename)
+            finally:
+                shutil.rmtree(project_name)
+
+
+    def test_the_output_file_is_written_to_the_specified_path(self):
+        template_string = "The user's name is [[NAME]] and his email is [[EMAIL]]."
+        variables = {
+            "NAME": "Harivansh",
+            "EMAIL": "hello@harivan.sh"
+        }
+        expected_parsed_template_string = "The user's name is Harivansh and his email is hello@harivan.sh."
+        project_name = "TheAwesomeProjectWithAnAwesomeName"
+        output_filename = "output.txt"
+
+        with ChangeDirectory("/tmp"):
+            try:
+                os.mkdir(project_name)
+
+                with ChangeDirectory(project_name):
+                    (Parser()
+                        .add_template_string(template_string)
+                        .parse(variables)
+                        .output(output_filename))
+
+                    with open(output_filename) as output:
+                        output_file_contents = output.read()
+
+                    self.assertEqual(output_file_contents, expected_parsed_template_string)
+            finally:
+                shutil.rmtree(project_name)

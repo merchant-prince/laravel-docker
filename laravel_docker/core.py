@@ -1,5 +1,6 @@
 import os
 import re
+from collections.abc import Mapping
 from laravel_docker.helpers import Question, Validation
 from scripting_utilities.skeleton import CreateSkeleton
 
@@ -98,23 +99,55 @@ class ProjectConfiguration:
 
 
 
-class Parse:
+class Parser:
 
 
-    TEMPLATE_DELIMITERS = "[[{}]]"
+    def __init__(self):
+        self._raw_template_string = None
+        self._parsed_template_string = None
 
 
-    def __init__(self, variables, template):
-        parsed_template = template
+    @property
+    def parsed_template_string(self):
+        return self._parsed_template_string
+
+
+    def read_template(self, template_path):
+        with open(template_path) as template:
+            self._raw_template_string = template.read()
+
+        return self
+
+
+    def add_template_string(self, template_string):
+        self._raw_template_string = template_string
+
+        return self
+
+
+    def parse(self,variables, delimiters_creator = lambda variable_name: f"[[{variable_name}]]"):
+        if not isinstance(variables, Mapping):
+            raise ValueError("The variables argument should be a Mapping (dict).")
+
+        if not callable(delimiters_creator):
+            raise ValueError("The delimiters_creator argument should be a callable.")
+
+        parsed_template = self._raw_template_string
 
         for name, value in variables.items():
-            parsed_template = parsed_template.replace(Parse.TEMPLATE_DELIMITERS.format(name), value)
+            parsed_template = parsed_template.replace(delimiters_creator(name), value)
 
-        self._parsed_template = parsed_template
-
-        if re.match(r'.*\[\[[A-Z][A-Z0-9_]+\]\].*', self._parsed_template) is not None:
+        if re.match(r'.*\[\[[A-Z][A-Z0-9_]+\]\].*', parsed_template) is not None:
             raise ValueError("There are still unparsed variables in the template.")
 
+        self._parsed_template_string = parsed_template
 
-    def __str__(self):
-        return self._parsed_template
+        return self
+
+
+    def output(self, file_path):
+        if os.path.isfile(file_path):
+            raise ValueError("Another file with the same name already exists.")
+
+        with open(file_path, "w") as file:
+            file.write(self._parsed_template_string)
