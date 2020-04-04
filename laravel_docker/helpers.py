@@ -247,9 +247,9 @@ class PrettyLog:
 
 
     @staticmethod
-    def start(message, type = "info"):
+    def message(message, position = "before", type = "info", eols_before = 1, eols_after = 2):
         """
-        Output message before calling the decorated function.
+        Outputs a message.
 
         Args:
             message (str):
@@ -258,67 +258,50 @@ class PrettyLog:
                 The type of print function to use. It should be one of the
                 following:
                     ["success", "info", "warning", "error"]
+            position (str):
+                Where to print the message; i.e. before or after calling the
+                decorated function. The accepted values are:
+                    ["before", "after"]
+            eols_before (int):
+                The number of EOLs to insert before the message.
+            eols_after (int):
+                The number of EOLs to insert after the message.
         """
+
+
+        if position not in ["before", "after"]:
+            raise ValueError("Invalid position provided.")
+
+        if type not in ["success", "info", "warning", "error"]:
+            raise ValueError("Invalid type provided.")
+
+
+        def print_message():
+            print_function = None
+
+            if type == "success":
+                print_function = Print.success
+            elif type == "info":
+                print_function = Print.info
+            elif type == "warning":
+                print_function = Print.warning
+            elif type == "error":
+                print_function = Print.error
+
+            Print.eol(eols_before)
+            print_function(message)
+            Print.eol(eols_after)
+
 
         def decorator(function):
             def wrapper(*args, **kwargs):
-                print_function = None
+                if position == "before":
+                    print_message()
 
-                if type == "success":
-                    print_function = Print.success
-                elif type == "info":
-                    print_function = Print.info
-                elif type == "warning":
-                    print_function = Print.warning
-                elif type == "error":
-                    print_function = Print.error
-                else:
-                    raise ValueError("There is no print function associated to the provided type.")
-
-                Print.eol()
-                print_function(message)
-                Print.eol(2)
-
-                return function(*args, **kwargs)
-
-            return wrapper
-
-        return decorator
-
-
-    @staticmethod
-    def end(message, type = "info"):
-        """
-        Output message after calling the decorated function.
-
-        Args:
-            message (str):
-                The message to print.
-            type (str):
-                The type of print function to use. It should be one of the
-                following:
-                    ["success", "info", "warning", "error"]
-        """
-
-        def decorator(function):
-            def wrapper(*args, **kwargs):
                 result = function(*args, **kwargs)
-                print_function = None
 
-                if type == "success":
-                    print_function = Print.success
-                elif type == "info":
-                    print_function = Print.info
-                elif type == "warning":
-                    print_function = Print.warning
-                elif type == "error":
-                    print_function = Print.error
-                else:
-                    raise ValueError("There is no print function associated to the provided type.")
-
-                Print.eol()
-                print_function(message)
-                Print.eol(2)
+                if position == "after":
+                    print_message()
 
                 return result
 

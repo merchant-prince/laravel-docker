@@ -339,7 +339,7 @@ class TestDecorators(TestCase):
         function_message = "function message"
         decorator_message = "Hello, world!"
 
-        @PrettyLog.start(f"{decorator_message}{delimiter}")
+        @PrettyLog.message(f"{decorator_message}{delimiter}")
         def test_function():
             print(f"{delimiter}{function_message}")
 
@@ -357,7 +357,7 @@ class TestDecorators(TestCase):
         function_message = "function message"
         decorator_message = "Hello, world!"
 
-        @PrettyLog.end(f"{delimiter}{decorator_message}")
+        @PrettyLog.message(f"{delimiter}{decorator_message}", position = "after")
         def test_function():
             print(f"{function_message}{delimiter}")
 
@@ -368,3 +368,15 @@ class TestDecorators(TestCase):
 
         self.assertTrue(function_message in messages[0])
         self.assertTrue(decorator_message in messages[-1])
+
+
+    def test_exception_is_raised_when_the_wrong_position_is_provided(self):
+        function = lambda x: x
+
+        self.assertRaises(ValueError, PrettyLog.message, function, position = "wrong_position")
+
+
+    def test_exception_is_raised_when_the_wrong_type_is_provided(self):
+        function = lambda x: x
+
+        self.assertRaises(ValueError, PrettyLog.message, function, type = "wrong_type")
