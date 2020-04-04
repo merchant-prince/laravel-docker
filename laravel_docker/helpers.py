@@ -14,8 +14,8 @@ class Question:
             e.g.: "What is your name?"
 
         validators ([callable]):
-            The validation function. This is normally a lambda function which
-            returns a ValueError when the validation fails, and the answer
+            The validation functions. This is an array of lambda functions which
+            return a ValueError when the validation fails, and the answer
             otherwise.
             e.g.: lambda a: a if len(a) < 33 else ValueError("Oops...")
 
@@ -84,6 +84,8 @@ class Question:
 class Validation:
     """
     This class is used to validate answers collected from the users.
+    Each of the validators implemented SHOULD raise a ValueError when the
+    condition of the validator is not met, and they should not return any value.
     """
 
 
@@ -151,6 +153,18 @@ class Validation:
 
 
 class Parser:
+    """
+    This is the parser responsible for processing the project configuration
+    templates provided.
+
+    Attributes:
+        TEMPLATES_DIRECTORY_PATH (str):
+            The absolute path to the templates directory.
+
+    Properties:
+        _raw_template_string (str)
+        _parsed_template_string (str)
+    """
 
 
     TEMPLATES_DIRECTORY_PATH = f"{os.path.dirname(os.path.abspath(__file__))}/templates"
@@ -168,10 +182,17 @@ class Parser:
 
     @staticmethod
     def template_path(path = ""):
-        return f"{Parser.TEMPLATES_DIRECTORY_PATH}/{path.strip('/')}"
+        if path.startswith("/"):
+            raise ValueError("You can only specify a relative path in this method.")
+
+        return f"{Parser.TEMPLATES_DIRECTORY_PATH}/{path.rstrip('/')}"
 
 
     def read_template(self, template_path):
+        """
+        Set the raw template string from the template specified.
+        """
+
         with open(template_path) as template:
             self._raw_template_string = template.read()
 
@@ -179,6 +200,10 @@ class Parser:
 
 
     def add_template_string(self, template_string):
+        """
+        Set the raw template string to the provided one.
+        """
+
         self._raw_template_string = template_string
 
         return self
@@ -215,10 +240,26 @@ class Parser:
 
 
 class PrettyLog:
+    """
+    This class contains decorators to output messages to stdout during the
+    installation process.
+    """
 
 
     @staticmethod
     def start(message, type = "info"):
+        """
+        Output message before calling the decorated function.
+
+        Args:
+            message (str):
+                The message to print.
+            type (str):
+                The type of print function to use. It should be one of the
+                following:
+                    ["success", "info", "warning", "error"]
+        """
+
         def decorator(function):
             def wrapper(*args, **kwargs):
                 print_function = None
@@ -247,6 +288,18 @@ class PrettyLog:
 
     @staticmethod
     def end(message, type = "info"):
+        """
+        Output message after calling the decorated function.
+
+        Args:
+            message (str):
+                The message to print.
+            type (str):
+                The type of print function to use. It should be one of the
+                following:
+                    ["success", "info", "warning", "error"]
+        """
+
         def decorator(function):
             def wrapper(*args, **kwargs):
                 result = function(*args, **kwargs)
