@@ -14,7 +14,7 @@ def get_project_environment_variables(file_path):
 
     with open(file_path) as environment_file:
         for line in environment_file:
-            key, value = [word.strip('"\n') for word in line.split("=", 1)]
+            key, value = [word.strip() for word in line.split("=", 1)]
             environment[key] = value
 
     return environment

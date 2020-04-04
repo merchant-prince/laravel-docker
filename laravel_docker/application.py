@@ -53,13 +53,20 @@ class Application:
     def _add_configuration_files(self):
         with ChangeDirectory(self.project_configuration["project"]["name"]):
             with ChangeDirectory("configuration"):
-                # nginx.conf
                 with ChangeDirectory("nginx"):
+                    # nginx.conf
                     (Parser().read_template(Parser.template_path("configuration/nginx/nginx.conf"))
                              .parse({
                                  "PROJECT_DOMAIN": self.project_configuration["project"]["domain"]
                              })
                              .output("nginx.conf"))
+
+                    # utils.conf
+                    (Parser().read_template(Parser.template_path("configuration/nginx/utils.conf"))
+                             .parse({
+                                 "PROJECT_DOMAIN": self.project_configuration["project"]["domain"]
+                             })
+                             .output("utils.conf"))
 
             with ChangeDirectory("dockerfiles"):
                 with ChangeDirectory("php"):
