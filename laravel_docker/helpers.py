@@ -145,3 +145,40 @@ class Validation:
                 raise ValueError(f"The provided value should be longer than {length} characters.")
 
         return minimum_length_validator
+
+
+
+
+class PrettyLog:
+
+
+    @staticmethod
+    def start(message):
+        def decorator(function):
+            def wrapper(*args, **kwargs):
+                Print.eol()
+                Print.info(message)
+                Print.eol(2)
+
+                return function(*args, **kwargs)
+
+            return wrapper
+
+        return decorator
+
+
+    @staticmethod
+    def end(message):
+        def decorator(function):
+            def wrapper(*args, **kwargs):
+                value = function(*args, **kwargs)
+
+                Print.eol()
+                Print.info(message)
+                Print.eol(2)
+
+                return value
+
+            return wrapper
+
+        return decorator

@@ -2,6 +2,7 @@ import os
 import stat
 from subprocess import run
 from scripting_utilities.print import Print
+from laravel_docker.helpers import PrettyLog
 from scripting_utilities.cd import ChangeDirectory
 from scripting_utilities.skeleton import CreateSkeleton
 from laravel_docker.core import ProjectConfiguration, Parser, LaravelInstaller
@@ -21,13 +22,13 @@ class Application:
         self._project_configuration = None
 
 
+    @PrettyLog.start("Setting up a new Laravel project.")
+    @PrettyLog.end("Your project was successfully installed.")
     def run(self):
         """
         The main method. It is here that all the various steps
         - of setting up the project - are called.
         """
-
-        self._start()
 
         self._configure()
 
@@ -37,24 +38,21 @@ class Application:
         self._laravel()
         self._git()
 
-        self._end()
-
-
-    def _start(self):
-        Print.eol()
-        Print.info("Setting up a new Laravel project.")
-        Print.eol(2)
-
-
-    def _end(self):
-        pass
-
 
     def _configure(self):
+        """
+        Ask the user some questions concerning the project to scaffold,
+        and record the answers in the application's configuration dict.
+        """
+
         self._project_configuration = ProjectConfiguration().initialize().get()
 
 
     def _structure(self):
+        """
+        Create the project structure.
+        """
+
         CreateSkeleton({
             self._project_configuration["project"]["name"]: {
                 "configuration": {

@@ -3,7 +3,7 @@ from io import StringIO
 from unittest import TestCase
 import tests.helpers as helpers
 from scripting_utilities.cd import ChangeDirectory
-from laravel_docker.helpers import Question, Validation
+from laravel_docker.helpers import Question, Validation, PrettyLog
 
 
 class TestQuestion(TestCase):
@@ -167,3 +167,44 @@ class TestValidators(TestCase):
         bad_url = "bad url.test"
 
         self.assertRaises(ValueError, Validation.is_url, bad_url)
+
+
+
+
+class TestDecorators(TestCase):
+
+
+    def test_start_decorator_outputs_message_before_calling_the_wrapped_function(self):
+        delimiter = "="
+        function_message = "function message"
+        decorator_message = "Hello, world!"
+
+        @PrettyLog.start(f"{decorator_message}{delimiter}")
+        def test_function():
+            print(f"{delimiter}{function_message}")
+
+        with helpers.suppressed_stdout() as stdout:
+            test_function()
+
+        messages = [token.strip() for token in stdout.getvalue().split(delimiter)]
+
+        self.assertTrue(decorator_message in messages[0])
+        self.assertTrue(function_message in messages[-1])
+
+
+    def test_end_decorator_outputs_message_after_calling_the_wrapped_function(self):
+        delimiter = "="
+        function_message = "function message"
+        decorator_message = "Hello, world!"
+
+        @PrettyLog.end(f"{delimiter}{decorator_message}")
+        def test_function():
+            print(f"{function_message}{delimiter}")
+
+        with helpers.suppressed_stdout() as stdout:
+            test_function()
+
+        messages = [token.strip() for token in stdout.getvalue().split(delimiter)]
+
+        self.assertTrue(function_message in messages[0])
+        self.assertTrue(decorator_message in messages[-1])
