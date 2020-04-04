@@ -3,7 +3,7 @@ import stat
 from scripting_utilities.print import Print
 from scripting_utilities.cd import ChangeDirectory
 from scripting_utilities.skeleton import CreateSkeleton
-from laravel_docker.core import ProjectConfiguration, Parser
+from laravel_docker.core import ProjectConfiguration, Parser, LaravelInstaller
 
 
 class Application:
@@ -26,6 +26,7 @@ class Application:
         self._initialize_project_configuration()
         self._setup_project_structure()
         self._add_configuration_files()
+        self._pull_laravel_application()
 
 
     def _initialize_project_configuration(self):
@@ -54,12 +55,12 @@ class Application:
         with ChangeDirectory(self.project_configuration["project"]["name"]):
             with ChangeDirectory("configuration"):
                 with ChangeDirectory("nginx"):
-                    # nginx.conf
-                    (Parser().read_template(Parser.template_path("configuration/nginx/nginx.conf"))
+                    # default.conf
+                    (Parser().read_template(Parser.template_path("configuration/nginx/default.conf"))
                              .parse({
                                  "PROJECT_DOMAIN": self.project_configuration["project"]["domain"]
                              })
-                             .output("nginx.conf"))
+                             .output("default.conf"))
 
                     # utils.conf
                     (Parser().read_template(Parser.template_path("configuration/nginx/utils.conf"))
@@ -114,3 +115,9 @@ class Application:
             (Parser().read_template(Parser.template_path("project.gitignore"))
                      .parse()
                      .output(".gitignore"))
+
+
+    def _pull_laravel_application(self):
+        with ChangeDirectory(self.project_configuration["project"]["name"]):
+            with ChangeDirectory("application"):
+                LaravelInstaller(self.project_configuration).pull()

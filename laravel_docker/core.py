@@ -1,5 +1,6 @@
 import os
 import re
+from subprocess import run
 from collections.abc import Mapping
 from laravel_docker.helpers import Question, Validation
 from scripting_utilities.skeleton import CreateSkeleton
@@ -123,3 +124,26 @@ class Parser:
 
         with open(file_path, "w") as file:
             file.write(self._parsed_template_string)
+
+
+
+class LaravelInstaller:
+
+
+    def __init__(self, project_configuration):
+        self._project_configuration = project_configuration
+
+
+    def pull(self):
+        run([
+            "docker", "run", "--rm",
+                             "--interactive",
+                             "--tty",
+                             "--user", f"{self._project_configuration['environment']['uid']}:{self._project_configuration['environment']['gid']}",
+                             "--mount", f"type=bind,source={os.getcwd()},target=/application",
+                             "--workdir", "/application",
+                             "composer", "create-project", "--prefer-dist",
+                                                           "--ignore-platform-reqs",
+                                                           "laravel/laravel", self._project_configuration["project"]["name"]],
+            check = True
+        )
