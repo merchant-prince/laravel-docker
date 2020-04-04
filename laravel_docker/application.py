@@ -4,7 +4,7 @@ from scripting_utilities.print import Print
 from laravel_docker.helpers import PrettyLog
 from scripting_utilities.cd import ChangeDirectory
 from scripting_utilities.skeleton import CreateSkeleton
-from laravel_docker.core import ProjectEnvironment, ProjectConfiguration, LaravelInstaller
+from laravel_docker.core import ProjectEnvironment, ProjectConfiguration, LaravelInstaller, Git
 
 
 class Application:
@@ -81,12 +81,4 @@ class Application:
 
     def _git(self):
         with ChangeDirectory(self._configuration["project"]["name"]):
-            commands = [
-                ["git", "init"],
-                ["git", "add", "."],
-                ["git", "commit", "-m", "initial commit"],
-                ["git", "checkout", "-b", "development"]
-            ]
-
-            for command in commands:
-                run(command, check = True)
+            Git.initialize()

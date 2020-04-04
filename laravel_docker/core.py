@@ -166,3 +166,21 @@ class LaravelInstaller:
             ],
             check = True
         )
+
+
+
+
+class Git:
+
+
+    @staticmethod
+    def initialize():
+        commands = [
+            ["git", "init"],
+            ["git", "add", "."],
+            ["git", "commit", "-m", "initial commit"],
+            ["git", "checkout", "-b", "development"]
+        ]
+
+        for command in commands:
+            run(command, check = True)
