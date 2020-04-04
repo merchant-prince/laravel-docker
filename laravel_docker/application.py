@@ -11,19 +11,12 @@ class Application:
 
 
     def __init__(self):
-        Print.eol()
-        Print.info("Setting up a new Laravel project.")
-        Print.eol(2)
-
         self._project_configuration = None
 
 
-    @property
-    def project_configuration(self):
-        return self._project_configuration
-
-
     def run(self):
+        self._start()
+
         self._configure()
 
         self._structure()
@@ -32,6 +25,18 @@ class Application:
         self._laravel()
         self._git()
 
+        self._end()
+
+
+    def _start(self):
+        Print.eol()
+        Print.info("Setting up a new Laravel project.")
+        Print.eol(2)
+
+
+    def _end(self):
+        pass
+
 
     def _configure(self):
         self._project_configuration = ProjectConfiguration().initialize().get()
@@ -39,7 +44,7 @@ class Application:
 
     def _structure(self):
         CreateSkeleton({
-            self.project_configuration["project"]["name"]: {
+            self._project_configuration["project"]["name"]: {
                 "configuration": {
                     "nginx": {}
                 },
@@ -52,20 +57,20 @@ class Application:
 
 
     def _scaffold(self):
-        with ChangeDirectory(self.project_configuration["project"]["name"]):
+        with ChangeDirectory(self._project_configuration["project"]["name"]):
             with ChangeDirectory("configuration"):
                 with ChangeDirectory("nginx"):
                     # default.conf
                     (Parser().read_template(Parser.template_path("configuration/nginx/default.conf"))
                              .parse({
-                                 "PROJECT_DOMAIN": self.project_configuration["project"]["domain"]
+                                 "PROJECT_DOMAIN": self._project_configuration["project"]["domain"]
                              })
                              .output("default.conf"))
 
                     # utils.conf
                     (Parser().read_template(Parser.template_path("configuration/nginx/utils.conf"))
                              .parse({
-                                 "PROJECT_DOMAIN": self.project_configuration["project"]["domain"]
+                                 "PROJECT_DOMAIN": self._project_configuration["project"]["domain"]
                              })
                              .output("utils.conf"))
 
@@ -89,9 +94,9 @@ class Application:
                      .output("docker-compose.yml"))
 
             environment_variables = {
-                "PROJECT_NAME": self.project_configuration["project"]["name"],
-                "USER_ID": self.project_configuration["environment"]["uid"],
-                "GROUP_ID": self.project_configuration["environment"]["gid"]
+                "PROJECT_NAME": self._project_configuration["project"]["name"],
+                "USER_ID": self._project_configuration["environment"]["uid"],
+                "GROUP_ID": self._project_configuration["environment"]["gid"]
             }
 
             # .env (for docker-compose)
@@ -118,13 +123,13 @@ class Application:
 
 
     def _laravel(self):
-        with ChangeDirectory(self.project_configuration["project"]["name"]):
+        with ChangeDirectory(self._project_configuration["project"]["name"]):
             with ChangeDirectory("application"):
-                LaravelInstaller(self.project_configuration).pull()
+                LaravelInstaller(self._project_configuration).pull()
 
 
     def _git(self):
-        with ChangeDirectory(self.project_configuration["project"]["name"]):
+        with ChangeDirectory(self._project_configuration["project"]["name"]):
             commands = [
                 ["git", "init"],
                 ["git", "add", "."],
