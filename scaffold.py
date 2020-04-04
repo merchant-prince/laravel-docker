@@ -6,8 +6,7 @@ from laravel_docker.application import Application
 
 if __name__ == "__main__":
     # try:
-        application = Application()
-        application.run()
+        Application().run()
     # except Exception as exception:
     #     Print.eol()
     #     Print.error(exception)

@@ -1,0 +1,8 @@
+astroid==2.3.3
+isort==4.3.21
+lazy-object-proxy==1.4.3
+mccabe==0.6.1
+pylint==2.4.4
+-e git+https://github.com/merchant-prince/python-scripting-utilities@93bc328b8a505c8dc0097152790bdb48d09815b6#egg=scripting_utilities
+six==1.14.0
+wrapt==1.11.2
