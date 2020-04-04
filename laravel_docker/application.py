@@ -24,22 +24,20 @@ class Application:
 
 
     def run(self):
-        self._initialize_project_configuration()
-        self._setup_project_structure()
-        self._add_configuration_files()
-        self._pull_laravel_application()
-        self._initialize_version_control()
+        self._configure()
+
+        self._structure()
+        self._scaffold()
+
+        self._laravel()
+        self._git()
 
 
-    def _initialize_project_configuration(self):
-        project_configuration = ProjectConfiguration()
-
-        project_configuration.initialize()
-
-        self._project_configuration = project_configuration.get()
+    def _configure(self):
+        self._project_configuration = ProjectConfiguration().initialize().get()
 
 
-    def _setup_project_structure(self):
+    def _structure(self):
         CreateSkeleton({
             self.project_configuration["project"]["name"]: {
                 "configuration": {
@@ -53,7 +51,7 @@ class Application:
         })
 
 
-    def _add_configuration_files(self):
+    def _scaffold(self):
         with ChangeDirectory(self.project_configuration["project"]["name"]):
             with ChangeDirectory("configuration"):
                 with ChangeDirectory("nginx"):
@@ -119,15 +117,20 @@ class Application:
                      .output(".gitignore"))
 
 
-    def _pull_laravel_application(self):
+    def _laravel(self):
         with ChangeDirectory(self.project_configuration["project"]["name"]):
             with ChangeDirectory("application"):
                 LaravelInstaller(self.project_configuration).pull()
 
 
-    def _initialize_version_control(self):
+    def _git(self):
         with ChangeDirectory(self.project_configuration["project"]["name"]):
-            run(["git", "init"])
-            run(["git", "add", "."])
-            run(["git", "commit", "-m", "initial commit"])
-            run(["git", "checkout", "-b", "development"])
+            commands = [
+                ["git", "init"],
+                ["git", "add", "."],
+                ["git", "commit", "-m", "initial commit"],
+                ["git", "checkout", "-b", "development"]
+            ]
+
+            for command in commands:
+                run(command, check = True)

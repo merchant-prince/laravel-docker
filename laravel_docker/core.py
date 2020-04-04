@@ -27,10 +27,15 @@ class ProjectConfiguration:
         Initialize the configuration dictionary. This is done by asking the
         user a few questions concerning the configuration options of the
         project.
+
+        Returns:
+            self
         """
 
         self._configuration["project"]["name"] = self._ask_for_project_name()
         self._configuration["project"]["domain"] = self._ask_for_domain_name()
+
+        return self
 
 
     def get(self):
