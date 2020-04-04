@@ -1,15 +1,12 @@
-import os
-from subprocess import run
-from scripting_utilities.print import Print
 from laravel_docker.helpers import PrettyLog
 from scripting_utilities.cd import ChangeDirectory
 from scripting_utilities.skeleton import CreateSkeleton
-from laravel_docker.core import ProjectEnvironment, ProjectConfiguration, LaravelInstaller, Git
+from laravel_docker.core import Git, LaravelInstaller, ProjectConfiguration, ProjectEnvironment
 
 
 class Application:
     """
-    The main application - responsible for setting up the project
+    The main application - responsible for setting up the project.
 
     Attributes:
         _project_configuration (dictionary):
@@ -22,7 +19,7 @@ class Application:
 
 
     @PrettyLog.start("Setting up a new Laravel project.")
-    @PrettyLog.end("Your project was successfully installed.")
+    @PrettyLog.end("Your project was successfully installed.", type = "success")
     def run(self):
         """
         The main method. It is here that all the various steps
@@ -38,6 +35,7 @@ class Application:
         self._git()
 
 
+    @PrettyLog.start("Configuring the project environment.")
     def _configure(self):
         """
         Ask the user some questions concerning the project to scaffold,
@@ -47,6 +45,7 @@ class Application:
         self._configuration = ProjectEnvironment().initialize().get()
 
 
+    @PrettyLog.start("Creating the project structure.")
     def _structure(self):
         """
         Create the project structure.
@@ -65,6 +64,7 @@ class Application:
         })
 
 
+    @PrettyLog.start("Scaffolding the project configuration files.")
     def _scaffold(self):
         """
         Create the project configuration files according to the templates.
@@ -73,12 +73,22 @@ class Application:
         ProjectConfiguration(self._configuration).setup()
 
 
+    @PrettyLog.start("Pulling a fresh Laravel instance.")
     def _laravel(self):
+        """
+        Pull a fresh laravel application.
+        """
+
         with ChangeDirectory(self._configuration["project"]["name"]):
             with ChangeDirectory("application"):
                 LaravelInstaller(self._configuration).pull()
 
 
+    @PrettyLog.start("Initializing a new git repository for the project.")
     def _git(self):
+        """
+        Initialize a git repo in the project root directory.
+        """
+
         with ChangeDirectory(self._configuration["project"]["name"]):
             Git.initialize()

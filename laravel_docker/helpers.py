@@ -218,11 +218,24 @@ class PrettyLog:
 
 
     @staticmethod
-    def start(message):
+    def start(message, type = "info"):
         def decorator(function):
             def wrapper(*args, **kwargs):
+                print_function = None
+
+                if type == "success":
+                    print_function = Print.success
+                elif type == "info":
+                    print_function = Print.info
+                elif type == "warning":
+                    print_function = Print.warning
+                elif type == "error":
+                    print_function = Print.error
+                else:
+                    raise ValueError("There is no print function associated to the provided type.")
+
                 Print.eol()
-                Print.info(message)
+                print_function(message)
                 Print.eol(2)
 
                 return function(*args, **kwargs)
@@ -233,16 +246,28 @@ class PrettyLog:
 
 
     @staticmethod
-    def end(message):
+    def end(message, type = "info"):
         def decorator(function):
             def wrapper(*args, **kwargs):
-                value = function(*args, **kwargs)
+                result = function(*args, **kwargs)
+                print_function = None
+
+                if type == "success":
+                    print_function = Print.success
+                elif type == "info":
+                    print_function = Print.info
+                elif type == "warning":
+                    print_function = Print.warning
+                elif type == "error":
+                    print_function = Print.error
+                else:
+                    raise ValueError("There is no print function associated to the provided type.")
 
                 Print.eol()
-                Print.info(message)
+                print_function(message)
                 Print.eol(2)
 
-                return value
+                return result
 
             return wrapper
 
