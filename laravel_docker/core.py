@@ -144,6 +144,7 @@ class LaravelInstaller:
                              "--workdir", "/application",
                              "composer", "create-project", "--prefer-dist",
                                                            "--ignore-platform-reqs",
-                                                           "laravel/laravel", self._project_configuration["project"]["name"]],
+                                                           "laravel/laravel", self._project_configuration["project"]["name"]
+            ],
             check = True
         )

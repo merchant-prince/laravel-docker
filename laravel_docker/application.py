@@ -1,5 +1,6 @@
 import os
 import stat
+from subprocess import run
 from scripting_utilities.print import Print
 from scripting_utilities.cd import ChangeDirectory
 from scripting_utilities.skeleton import CreateSkeleton
@@ -27,6 +28,7 @@ class Application:
         self._setup_project_structure()
         self._add_configuration_files()
         self._pull_laravel_application()
+        self._initialize_version_control()
 
 
     def _initialize_project_configuration(self):
@@ -121,3 +123,11 @@ class Application:
         with ChangeDirectory(self.project_configuration["project"]["name"]):
             with ChangeDirectory("application"):
                 LaravelInstaller(self.project_configuration).pull()
+
+
+    def _initialize_version_control(self):
+        with ChangeDirectory(self.project_configuration["project"]["name"]):
+            run(["git", "init"])
+            run(["git", "add", "."])
+            run(["git", "commit", "-m", "initial commit"])
+            run(["git", "checkout", "-b", "development"])
