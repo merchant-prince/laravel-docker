@@ -8,6 +8,13 @@ from laravel_docker.core import ProjectConfiguration, Parser, LaravelInstaller
 
 
 class Application:
+    """
+    The main application - responsible for setting up the project
+
+    Attributes:
+        _project_configuration (dictionary):
+            The main environment/configuration array of the application.
+    """
 
 
     def __init__(self):
@@ -15,6 +22,11 @@ class Application:
 
 
     def run(self):
+        """
+        The main method. It is here that all the various steps
+        - of setting up the project - are called.
+        """
+
         self._start()
 
         self._configure()

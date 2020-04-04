@@ -1,12 +1,18 @@
 #! /usr/bin/env python3
 
-from scripting_utilities.print import Print
+
+"""
+This script is used to initialize and run the main application.
+"""
+
+
+# from scripting_utilities.print import Print
 from laravel_docker.application import Application
 
 
 if __name__ == "__main__":
     # try:
-        Application().run()
+    Application().run()
     # except Exception as exception:
     #     Print.eol()
     #     Print.error(exception)
