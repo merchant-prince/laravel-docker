@@ -1,13 +1,18 @@
 import os
-import re
 import stat
 from subprocess import run
 from scripting_utilities.cd import ChangeDirectory
-from scripting_utilities.skeleton import CreateSkeleton
-from laravel_docker.helpers import Question, Validation, Parser
+from laravel_docker.helpers import Parser, Question, Validation
 
 
 class ProjectEnvironment:
+    """
+    This class is responsible for asking the user questions about the project.
+
+    Attributes:
+        _configuration (dict):
+            A mapping containing the project configuration.
+    """
 
 
     def __init__(self):
@@ -33,8 +38,8 @@ class ProjectEnvironment:
             self
         """
 
-        self._configuration["project"]["name"] = self._ask_for_project_name()
-        self._configuration["project"]["domain"] = self._ask_for_domain_name()
+        self._configuration["project"]["name"] = self._query_project_name()
+        self._configuration["project"]["domain"] = self._query_domain_name()
 
         return self
 
@@ -50,7 +55,7 @@ class ProjectEnvironment:
         return self._configuration
 
 
-    def _ask_for_project_name(self):
+    def _query_project_name(self):
         return str(Question(
             "Enter the project name",
             [
@@ -60,7 +65,7 @@ class ProjectEnvironment:
         ))
 
 
-    def _ask_for_domain_name(self):
+    def _query_domain_name(self):
         return str(Question(
             "Enter the project domain",
             [Validation.is_url],
@@ -71,6 +76,16 @@ class ProjectEnvironment:
 
 
 class ProjectConfiguration:
+    """
+    This class is responsible for creating the appropriate project-level
+    configuration files from the provided templates and the environment
+    variables.
+
+    Attributes:
+        _configuration (dict):
+            The configuration / environment variables of the project. This
+            dict SHOULD NOT BE ALTERED.
+    """
 
 
     def __init__(self, configuration):
@@ -78,6 +93,10 @@ class ProjectConfiguration:
 
 
     def setup(self):
+        """
+        Set up the configuration files.
+        """
+
         with ChangeDirectory(self._configuration["project"]["name"]):
             with ChangeDirectory("configuration"):
                 with ChangeDirectory("nginx"):
@@ -146,23 +165,36 @@ class ProjectConfiguration:
 
 
 class LaravelInstaller:
+    """
+    This class is responsible for pulling a fresh Laravel instance into the
+    current project.
+
+    Attributes:
+        _configuration (dict):
+            The configuration / environment variables of the project. This
+            dict SHOULD NOT BE ALTERED.
+    """
 
 
-    def __init__(self, project_configuration):
-        self._project_configuration = project_configuration
+    def __init__(self, configuration):
+        self._configuration = configuration
 
 
     def pull(self):
+        """
+        Pull a fresh Laravel application.
+        """
+
         run([
             "docker", "run", "--rm",
                              "--interactive",
                              "--tty",
-                             "--user", f"{self._project_configuration['environment']['uid']}:{self._project_configuration['environment']['gid']}",
+                             "--user", f"{self._configuration['environment']['uid']}:{self._configuration['environment']['gid']}",
                              "--mount", f"type=bind,source={os.getcwd()},target=/application",
                              "--workdir", "/application",
                              "composer", "create-project", "--prefer-dist",
                                                            "--ignore-platform-reqs",
-                                                           "laravel/laravel", self._project_configuration["project"]["name"]
+                                                           "laravel/laravel", self._configuration["project"]["name"]
             ],
             check = True
         )
@@ -171,10 +203,18 @@ class LaravelInstaller:
 
 
 class Git:
+    """
+    Initialize a new git repository in the current directory.
+    """
 
 
     @staticmethod
     def initialize():
+        """
+        Initialize, create the first commit, and checkout to a new development
+        branch.
+        """
+
         commands = [
             ["git", "init"],
             ["git", "add", "."],

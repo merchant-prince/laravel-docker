@@ -21,7 +21,7 @@ class TestProjectEnvironment(TestCase):
         max_tries = 3
 
         with helpers.suppressed_stdout(), helpers.send_input(f"{project_name}\n" * max_tries):
-            self.assertRaises(ValueError, configuration._ask_for_project_name)
+            self.assertRaises(ValueError, configuration._query_project_name)
 
 
     def test_project_name_is_rejected_if_cwd_has_a_directory_with_the_same_name(self):
@@ -35,7 +35,7 @@ class TestProjectEnvironment(TestCase):
                 max_tries = 3
 
                 with helpers.suppressed_stdout(), helpers.send_input(f"{project_name}\n" * max_tries):
-                    self.assertRaises(ValueError, configuration._ask_for_project_name)
+                    self.assertRaises(ValueError, configuration._query_project_name)
             finally:
                 os.rmdir(project_name)
 
@@ -45,7 +45,7 @@ class TestProjectEnvironment(TestCase):
         project_name = "CorrectProjectName"
 
         with helpers.suppressed_stdout(), helpers.send_input(project_name):
-            captured_project_name = configuration._ask_for_project_name()
+            captured_project_name = configuration._query_project_name()
 
         self.assertEqual(captured_project_name, project_name)
 
@@ -56,7 +56,7 @@ class TestProjectEnvironment(TestCase):
         max_tries = 3
 
         with helpers.suppressed_stdout(), helpers.send_input(f"{invalid_domain}\n" * max_tries):
-            self.assertRaises(ValueError, configuration._ask_for_domain_name)
+            self.assertRaises(ValueError, configuration._query_domain_name)
 
 
     def test_a_valid_domain_name_is_accepted(self):
@@ -64,7 +64,7 @@ class TestProjectEnvironment(TestCase):
         domain = "application.local"
 
         with helpers.suppressed_stdout(), helpers.send_input(domain):
-            captured_domain = configuration._ask_for_domain_name()
+            captured_domain = configuration._query_domain_name()
 
         self.assertEqual(captured_domain, domain)
 
@@ -75,12 +75,6 @@ class TestProjectEnvironment(TestCase):
         configuration._configuration["project"]["domain"] = domain
 
         with helpers.suppressed_stdout(), helpers.send_input("\n"):
-            captured_domain = configuration._ask_for_domain_name()
+            captured_domain = configuration._query_domain_name()
 
         self.assertEqual(captured_domain, domain)
-
-
-
-
-class TestProjectConfiguration(TestCase):
-    pass
