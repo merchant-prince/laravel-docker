@@ -5,7 +5,7 @@ from scripting_utilities.print import Print
 from laravel_docker.helpers import PrettyLog
 from scripting_utilities.cd import ChangeDirectory
 from scripting_utilities.skeleton import CreateSkeleton
-from laravel_docker.core import ProjectConfiguration, Parser, LaravelInstaller
+from laravel_docker.core import ProjectEnvironment, ProjectConfiguration, Parser, LaravelInstaller
 
 
 class Application:
@@ -19,7 +19,7 @@ class Application:
 
 
     def __init__(self):
-        self._project_configuration = None
+        self._configuration = None
 
 
     @PrettyLog.start("Setting up a new Laravel project.")
@@ -45,7 +45,7 @@ class Application:
         and record the answers in the application's configuration dict.
         """
 
-        self._project_configuration = ProjectConfiguration().initialize().get()
+        self._configuration = ProjectEnvironment().initialize().get()
 
 
     def _structure(self):
@@ -54,7 +54,7 @@ class Application:
         """
 
         CreateSkeleton({
-            self._project_configuration["project"]["name"]: {
+            self._configuration["project"]["name"]: {
                 "configuration": {
                     "nginx": {}
                 },
@@ -67,20 +67,20 @@ class Application:
 
 
     def _scaffold(self):
-        with ChangeDirectory(self._project_configuration["project"]["name"]):
+        with ChangeDirectory(self._configuration["project"]["name"]):
             with ChangeDirectory("configuration"):
                 with ChangeDirectory("nginx"):
                     # default.conf
                     (Parser().read_template(Parser.template_path("configuration/nginx/default.conf"))
                              .parse({
-                                 "PROJECT_DOMAIN": self._project_configuration["project"]["domain"]
+                                 "PROJECT_DOMAIN": self._configuration["project"]["domain"]
                              })
                              .output("default.conf"))
 
                     # utils.conf
                     (Parser().read_template(Parser.template_path("configuration/nginx/utils.conf"))
                              .parse({
-                                 "PROJECT_DOMAIN": self._project_configuration["project"]["domain"]
+                                 "PROJECT_DOMAIN": self._configuration["project"]["domain"]
                              })
                              .output("utils.conf"))
 
@@ -104,9 +104,9 @@ class Application:
                      .output("docker-compose.yml"))
 
             environment_variables = {
-                "PROJECT_NAME": self._project_configuration["project"]["name"],
-                "USER_ID": self._project_configuration["environment"]["uid"],
-                "GROUP_ID": self._project_configuration["environment"]["gid"]
+                "PROJECT_NAME": self._configuration["project"]["name"],
+                "USER_ID": self._configuration["environment"]["uid"],
+                "GROUP_ID": self._configuration["environment"]["gid"]
             }
 
             # .env (for docker-compose)
@@ -133,13 +133,13 @@ class Application:
 
 
     def _laravel(self):
-        with ChangeDirectory(self._project_configuration["project"]["name"]):
+        with ChangeDirectory(self._configuration["project"]["name"]):
             with ChangeDirectory("application"):
-                LaravelInstaller(self._project_configuration).pull()
+                LaravelInstaller(self._configuration).pull()
 
 
     def _git(self):
-        with ChangeDirectory(self._project_configuration["project"]["name"]):
+        with ChangeDirectory(self._configuration["project"]["name"]):
             commands = [
                 ["git", "init"],
                 ["git", "add", "."],
