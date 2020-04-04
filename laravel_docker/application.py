@@ -1,7 +1,7 @@
 from laravel_docker.helpers import PrettyLog
 from scripting_utilities.cd import ChangeDirectory
 from scripting_utilities.skeleton import CreateSkeleton
-from laravel_docker.core import Git, LaravelInstaller, ProjectConfiguration, ProjectEnvironment
+from laravel_docker.core import Env, Git, LaravelInstaller, ProjectConfiguration, ProjectEnvironment
 
 
 class Application:
@@ -26,13 +26,30 @@ class Application:
         - of setting up the project - are called.
         """
 
+        (self._pre_install()
+             ._install()
+             ._post_install())
+
+
+    def _pre_install(self):
         self._configure()
 
+        return self
+
+
+    def _install(self):
         self._structure()
         self._scaffold()
-
         self._laravel()
+
+        return self
+
+
+    def _post_install(self):
         self._git()
+        self._env()
+
+        return self
 
 
     @PrettyLog.message("Configuring the project environment.")
@@ -87,8 +104,22 @@ class Application:
     @PrettyLog.message("Initializing a new git repository for the project.")
     def _git(self):
         """
-        Initialize a git repo in the project root directory.
+        Initialize a git repository in the project root directory.
         """
 
         with ChangeDirectory(self._configuration["project"]["name"]):
             Git.initialize()
+
+
+    def _env(self):
+        """
+        Change the environment variables of the laravel application.
+        """
+
+        project_name = self._configuration["project"]["name"]
+
+        with ChangeDirectory(project_name):
+            with ChangeDirectory("application"):
+                with ChangeDirectory(project_name):
+                    (Env(".env").replace(self._configuration["application"]["environment"])
+                                .write(".env"))

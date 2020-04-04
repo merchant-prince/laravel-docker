@@ -8,7 +8,7 @@ from contextlib import contextmanager
 def suppressed_stdout():
     """
     Supress stdout in the current context, and redirect it to another buffer.
-    This buffer is available in the "as" buffer of the associated context
+    This buffer is available in the "as" variable of the associated context
     manager within a "with" statement.
 
     Usage:

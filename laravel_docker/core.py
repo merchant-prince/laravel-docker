@@ -1,6 +1,7 @@
 import os
 import stat
 from subprocess import run
+from collections.abc import Mapping
 from scripting_utilities.cd import ChangeDirectory
 from laravel_docker.helpers import Parser, Question, Validation
 
@@ -19,11 +20,24 @@ class ProjectEnvironment:
         self._configuration = {
             "project": {
                 "name": None,
-                "domain": "application.local"
+                "domain": "application.local",
             },
             "environment": {
                 "uid": os.geteuid(),
                 "gid": os.getegid()
+            },
+            "application": {
+                "environment": {
+                    "APP_NAME": None,
+                    "APP_URL": None,
+
+                    "DB_CONNECTION": "pgsql",
+                    "DB_HOST": "postgresql",
+                    "DB_PORT": 5432,
+                    "DB_DATABASE": "application",
+                    "DB_USERNAME": "username",
+                    "DB_PASSWORD": "password"
+                }
             }
         }
 
@@ -40,6 +54,9 @@ class ProjectEnvironment:
 
         self._configuration["project"]["name"] = self._query_project_name()
         self._configuration["project"]["domain"] = self._query_domain_name()
+
+        self._configuration["application"]["environment"]["APP_NAME"] = self._configuration["project"]["name"]
+        self._configuration["application"]["environment"]["APP_URL"] = f"http://{self._configuration['project']['domain']}"
 
         return self
 
@@ -135,8 +152,13 @@ class ProjectConfiguration:
 
             environment_variables = {
                 "PROJECT_NAME": self._configuration["project"]["name"],
+
                 "USER_ID": self._configuration["environment"]["uid"],
-                "GROUP_ID": self._configuration["environment"]["gid"]
+                "GROUP_ID": self._configuration["environment"]["gid"],
+
+                "DB_NAME": self._configuration["application"]["environment"]["DB_DATABASE"],
+                "DB_USERNAME": self._configuration["application"]["environment"]["DB_USERNAME"],
+                "DB_PASSWORD": self._configuration["application"]["environment"]["DB_PASSWORD"],
             }
 
             # .env (for docker-compose)
@@ -224,3 +246,37 @@ class Git:
 
         for command in commands:
             run(command, check = True)
+
+
+
+
+class Env:
+    """
+    This class is responsible for the changes made to the application's
+    (laravel's) .env file.
+    """
+
+
+    def __init__(self, file_path):
+        with open(file_path) as env:
+            self._contents = env.read()
+
+
+    def replace(self, replacement):
+        """
+        Replace the environment values with the one provided.
+
+        Args:
+            replacement (dict):
+                The values to replace the current environment with.
+        """
+
+        if not isinstance(replacement, Mapping):
+            raise ValueError("The replacement argument should be a Mapping.")
+
+        return self
+
+
+    def write(self, file_path):
+
+        return self
