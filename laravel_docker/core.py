@@ -75,7 +75,7 @@ class ProjectEnvironment:
 
     def _query_project_name(self):
         return str(Question(
-            "Enter the project name",
+            "Project name",
             [
                 Validation.is_pascalcased,
                 Validation.directory_existence
@@ -85,7 +85,7 @@ class ProjectEnvironment:
 
     def _query_domain_name(self):
         return str(Question(
-            "Enter the project domain",
+            "Project domain",
             [Validation.is_url],
             self._configuration["project"]["domain"]
         ))
