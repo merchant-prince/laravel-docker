@@ -132,6 +132,7 @@ class Application:
             Git.initialize()
 
 
+    @PrettyLog.message("Editing the application's environment file.")
     def _env(self):
         """
         Change the environment variables of the laravel application.
