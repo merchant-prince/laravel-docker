@@ -38,8 +38,8 @@ RUN userdel -f www-data && \
           /home/www-data
 
 RUN touch /var/log/www-data.cron.log \
- && chown www-data:www-data /var/log/www-data.cron.log \
- && echo "* * * * *    www-data    php /var/www/html/artisan schedule:run >> /var/log/www-data.cron.log 2>&1" >> /etc/crontab
+ && chown www-data:www-data /var/log/application.cron.log \
+ && echo "* * * * *    www-data    php /var/www/html/artisan schedule:run >> /var/log/application.cron.log 2>&1" >> /etc/crontab
 
 VOLUME [ "/var/www/html" ]
 
