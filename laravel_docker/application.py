@@ -1,6 +1,6 @@
 from laravel_docker.helpers import PrettyLog
 from scripting_utilities import ChangeDirectory, CreateSkeleton
-from laravel_docker.core import Env, Git, LaravelInstaller, ProjectConfiguration, ProjectEnvironment
+from laravel_docker.core import Env, Git, LaravelInstaller, ProjectConfiguration, ProjectEnvironment, Ssl
 
 
 class Application:
@@ -38,6 +38,7 @@ class Application:
 
     def _install(self):
         self._structure()
+        self._ssl()
         self._scaffold()
         self._laravel()
 
@@ -70,7 +71,9 @@ class Application:
         CreateSkeleton({
             self._configuration["project"]["name"]: {
                 "configuration": {
-                    "nginx": {}
+                    "nginx": {
+                        "ssl": {}
+                    }
                 },
                 "dockerfiles": {
                     "php": {}
@@ -78,6 +81,24 @@ class Application:
                 "application": {}
             }
         })
+
+
+    @PrettyLog.message("Generating SSL certificates.")
+    def _ssl(self):
+        """
+        Generate TLS / SSL certificates.
+        """
+
+        with ChangeDirectory(self._configuration["project"]["name"]):
+            with ChangeDirectory("configuration"):
+                with ChangeDirectory("nginx"):
+                    with ChangeDirectory("ssl"):
+                        key_path = f"{self._configuration['ssl']['key_name']}"
+                        certificate_path = f"{self._configuration['ssl']['certificate_name']}"
+
+                        (Ssl(self._configuration["project"]["domain"])
+                            .generate()
+                            .write(key_path, certificate_path))
 
 
     @PrettyLog.message("Scaffolding the project configuration files.")

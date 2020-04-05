@@ -154,7 +154,7 @@ class Validation:
             re.IGNORECASE
         )
 
-        if re.match(url_regex, f"http://{value}") is None:
+        if re.match(url_regex, f"https://{value}") is None:
             raise ValueError("The provided value is not a valid domain.")
 
 

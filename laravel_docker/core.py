@@ -6,6 +6,16 @@ from collections.abc import Mapping
 from scripting_utilities import ChangeDirectory
 from laravel_docker.helpers import Parser, Question, Validation
 
+# The following imports are for the Ssl class.
+import ipaddress
+from cryptography import x509
+from datetime import datetime, timedelta
+from cryptography.x509.oid import NameOID
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.asymmetric import rsa
+
 
 class ProjectEnvironment:
     """
@@ -22,6 +32,10 @@ class ProjectEnvironment:
             "project": {
                 "name": None,
                 "domain": "application.local",
+            },
+            "ssl": {
+                "key_name": "key.pem",
+                "certificate_name": "certificate.pem"
             },
             "environment": {
                 "uid": os.geteuid(),
@@ -57,7 +71,7 @@ class ProjectEnvironment:
         self._configuration["project"]["domain"] = self._query_domain_name()
 
         self._configuration["application"]["environment"]["APP_NAME"] = self._configuration["project"]["name"]
-        self._configuration["application"]["environment"]["APP_URL"] = f"http://{self._configuration['project']['domain']}"
+        self._configuration["application"]["environment"]["APP_URL"] = f"https://{self._configuration['project']['domain']}"
 
         return self
 
@@ -121,7 +135,11 @@ class ProjectConfiguration:
                     # default.conf
                     (Parser().read_template(Parser.template_path("configuration/nginx/default.conf"))
                              .parse({
-                                 "PROJECT_DOMAIN": self._configuration["project"]["domain"]
+                                 "PROJECT_DOMAIN": self._configuration["project"]["domain"],
+
+                                 "SSL_KEY_NAME": self._configuration["ssl"]["key_name"],
+                                 "SSL_CERTIFICATE_NAME": self._configuration["ssl"]["certificate_name"],
+
                              })
                              .output("default.conf"))
 
@@ -156,6 +174,9 @@ class ProjectConfiguration:
 
                 "USER_ID": self._configuration["environment"]["uid"],
                 "GROUP_ID": self._configuration["environment"]["gid"],
+
+                "SSL_KEY_NAME": self._configuration["ssl"]["key_name"],
+                "SSL_CERTIFICATE_NAME": self._configuration["ssl"]["certificate_name"],
 
                 "DB_NAME": self._configuration["application"]["environment"]["DB_DATABASE"],
                 "DB_USERNAME": self._configuration["application"]["environment"]["DB_USERNAME"],
@@ -292,3 +313,95 @@ class Env:
                     line = f"{key}={value}"
 
                 print(line)
+
+
+
+
+class Ssl:
+    """
+    This class is responsible for creating x509 TLS/SSL certificates.
+
+    Attributes:
+        _hostname (str):
+            The hostname of the machine on which the certificates will be hosted.
+        _key_size (int):
+            The size of the SSL key.
+        _validity (int):
+            The number number of days (since creation) for which the certificate
+            will remain valid.
+        _key (bytes):
+            The TLS key.
+        _certificate (bytes):
+            The TLS certificate.
+    """
+
+
+    def __init__(self, hostname, key_size = 4096, validity = 365):
+        self._hostname = hostname
+        self._key_size = key_size
+        self._validity = validity
+
+        self._key = None
+        self._certificate = None
+
+
+    def generate(self):
+        """
+        Generate the TLS/SSL key and certificate.
+
+        Return:
+            self
+        """
+
+        key = rsa.generate_private_key(
+            public_exponent = 65537,
+            key_size = self._key_size,
+            backend = default_backend(),
+        )
+
+        name = x509.Name([
+            x509.NameAttribute(NameOID.COMMON_NAME, self._hostname)
+        ])
+
+        san = x509.SubjectAlternativeName([
+            x509.DNSName(self._hostname)
+        ])
+
+        basic_contraints = x509.BasicConstraints(ca = True, path_length = 0)
+        now = datetime.utcnow()
+
+        cert = (
+            x509.CertificateBuilder()
+                .subject_name(name)
+                .issuer_name(name)
+                .public_key(key.public_key())
+                .serial_number(1000)
+                .not_valid_before(now)
+                .not_valid_after(now + timedelta(days = self._validity))
+                .add_extension(basic_contraints, False)
+                .add_extension(san, False)
+                .sign(key, hashes.SHA256(), default_backend())
+        )
+
+        self._certificate = cert.public_bytes(encoding = serialization.Encoding.PEM)
+        self._key = key.private_bytes(
+            encoding = serialization.Encoding.PEM,
+            format = serialization.PrivateFormat.TraditionalOpenSSL,
+            encryption_algorithm = serialization.NoEncryption(),
+        )
+
+        return self
+
+
+    def write(self, key_path = "key.pem", certificate_path = "certificate.pem"):
+        """
+        Write the generated certificates to a binary file.
+
+        Args:
+            key_path (str): The path where the key will be stored.
+            certificate_path (str): The path where the certificate will be stored.
+        """
+
+        with open(key_path, "wb") as key, open(certificate_path, "wb") as certificate:
+            key.write(self._key)
+            certificate.write(self._certificate)
