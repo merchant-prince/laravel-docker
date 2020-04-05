@@ -117,9 +117,9 @@ class Application:
         """
 
         project_name = self._configuration["project"]["name"]
+        environment_variables = self._configuration["application"]["environment"]
 
         with ChangeDirectory(project_name):
             with ChangeDirectory("application"):
                 with ChangeDirectory(project_name):
-                    (Env(".env").replace(self._configuration["application"]["environment"])
-                                .write(".env"))
+                    Env(".env").replace(environment_variables)

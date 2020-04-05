@@ -1,5 +1,6 @@
 import os
 import stat
+import fileinput
 from subprocess import run
 from collections.abc import Mapping
 from scripting_utilities.cd import ChangeDirectory
@@ -258,8 +259,7 @@ class Env:
 
 
     def __init__(self, file_path):
-        with open(file_path) as env:
-            self._contents = env.read()
+        self._file_path = file_path
 
 
     def replace(self, replacement):
@@ -274,9 +274,21 @@ class Env:
         if not isinstance(replacement, Mapping):
             raise ValueError("The replacement argument should be a Mapping.")
 
-        return self
+        with fileinput.input(self._file_path, inplace = True) as env:
+            for line in env:
+                line = line.strip()
 
+                if line != "" and "=" in line:
+                    items = [word for word in line.split("=", 1)]
 
-    def write(self, file_path):
+                    if len(items) == 1:
+                        items.append(None)
 
-        return self
+                    key, value = items
+
+                    if key in replacement:
+                        value = replacement[key]
+
+                    line = f"{key}={value}"
+
+                print(line)
