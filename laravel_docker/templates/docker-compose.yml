@@ -5,13 +5,13 @@ services:
     nginx:
         image: nginx:${NGINX_IMAGE_TAG}
         volumes:
-            - ./configuration/nginx:/etc/nginx/conf.d:ro
+            - ./configuration/nginx/conf.d:/etc/nginx/conf.d:ro
             - ./configuration/nginx/ssl:/etc/nginx/ssl:ro
             - ./application/${PROJECT_NAME}:/var/www/html:ro
         ports:
             - "80:80"
             - "443:443"
-            - "8080:8080" # adminer
+            - "${ADMINER_PORT}:${ADMINER_PORT}"
         restart: always
         depends_on:
             - php

@@ -41,6 +41,11 @@ class ProjectEnvironment:
                 "uid": os.geteuid(),
                 "gid": os.getegid()
             },
+            "services": {
+                "adminer": {
+                    "port": 8080
+                }
+            },
             "application": {
                 "environment": {
                     "APP_NAME": None,
@@ -132,23 +137,25 @@ class ProjectConfiguration:
         with ChangeDirectory(self._configuration["project"]["name"]):
             with ChangeDirectory("configuration"):
                 with ChangeDirectory("nginx"):
-                    # default.conf
-                    (Parser().read_template(Parser.template_path("configuration/nginx/default.conf"))
-                             .parse({
-                                 "PROJECT_DOMAIN": self._configuration["project"]["domain"],
+                    with ChangeDirectory("conf.d"):
+                        # default.conf
+                        (Parser().read_template(Parser.template_path("configuration/nginx/default.conf"))
+                                .parse({
+                                    "PROJECT_DOMAIN": self._configuration["project"]["domain"],
 
-                                 "SSL_KEY_NAME": self._configuration["ssl"]["key_name"],
-                                 "SSL_CERTIFICATE_NAME": self._configuration["ssl"]["certificate_name"],
+                                    "SSL_KEY_NAME": self._configuration["ssl"]["key_name"],
+                                    "SSL_CERTIFICATE_NAME": self._configuration["ssl"]["certificate_name"],
 
-                             })
-                             .output("default.conf"))
+                                })
+                                .output("default.conf"))
 
-                    # utils.conf
-                    (Parser().read_template(Parser.template_path("configuration/nginx/utils.conf"))
-                             .parse({
-                                 "PROJECT_DOMAIN": self._configuration["project"]["domain"]
-                             })
-                             .output("utils.conf"))
+                        # utils.conf
+                        (Parser().read_template(Parser.template_path("configuration/nginx/utils.conf"))
+                                .parse({
+                                    "PROJECT_DOMAIN": self._configuration["project"]["domain"],
+                                    "ADMINER_PORT": self._configuration["services"]["adminer"]["port"]
+                                })
+                                .output("utils.conf"))
 
             with ChangeDirectory("dockerfiles"):
                 with ChangeDirectory("php"):
@@ -174,6 +181,8 @@ class ProjectConfiguration:
 
                 "USER_ID": self._configuration["environment"]["uid"],
                 "GROUP_ID": self._configuration["environment"]["gid"],
+
+                "ADMINER_PORT": self._configuration["services"]["adminer"]["port"],
 
                 "SSL_KEY_NAME": self._configuration["ssl"]["key_name"],
                 "SSL_CERTIFICATE_NAME": self._configuration["ssl"]["certificate_name"],

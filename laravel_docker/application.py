@@ -72,6 +72,7 @@ class Application:
             self._configuration["project"]["name"]: {
                 "configuration": {
                     "nginx": {
+                        "conf.d": {},
                         "ssl": {}
                     }
                 },
