@@ -39,11 +39,12 @@ RUN userdel -f www-data && \
           ${USER_ID}:${GROUP_ID} \
           /home/www-data
 
+# Setup cron & associated logging
 RUN touch /var/log/application.cron.log \
  && chown www-data:www-data /var/log/application.cron.log \
  && echo "* * * * *    www-data    php /var/www/html/artisan schedule:run >> /var/log/application.cron.log 2>&1" >> /etc/crontab
 
-VOLUME [ "/var/www/html", "/home/www-data/custom-entrypoint.sh" ]
+VOLUME [ "/var/www/html", "/home/www-data/custom-entrypoint.sh", "${PHP_INI_DIR}/conf.d/custom-php.ini" ]
 
 ENTRYPOINT [ "/home/www-data/custom-entrypoint.sh" ]
 

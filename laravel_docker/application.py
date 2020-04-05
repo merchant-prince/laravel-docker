@@ -74,7 +74,10 @@ class Application:
                     "nginx": {
                         "conf.d": {},
                         "ssl": {}
-                    }
+                    },
+                    "php": {
+                        "custom-php.ini": ""
+                    },
                 },
                 "dockerfiles": {
                     "php": {}
