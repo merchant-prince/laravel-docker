@@ -1,8 +1,11 @@
 import os
+import random
+import shutil
+import string
 from unittest import TestCase
 import tests.helpers as helpers
 from scripting_utilities import ChangeDirectory
-from laravel_docker.core import ProjectConfiguration, ProjectEnvironment
+from laravel_docker.core import ProjectConfiguration, ProjectEnvironment, Ssl
 
 
 class TestProjectEnvironment(TestCase):
@@ -78,3 +81,31 @@ class TestProjectEnvironment(TestCase):
             captured_domain = configuration._query_domain_name()
 
         self.assertEqual(captured_domain, domain)
+
+
+
+
+class TestSsl(TestCase):
+
+
+    def test_ssl_certificates_are_successfully_generated(self):
+        directory_name = ''.join(random.choices(string.ascii_lowercase, k = 32))
+
+        with ChangeDirectory("/tmp"):
+            try:
+                os.mkdir(directory_name)
+
+                with ChangeDirectory(directory_name):
+                    key_path = "key.pem"
+                    certificate_path = "certificate.pem"
+
+                    Ssl("application.local").generate().write(
+                        key_path,
+                        certificate_path
+                    )
+
+                    self.assertTrue(
+                        os.path.isfile(key_path) and os.path.isfile(certificate_path)
+                    )
+            finally:
+                shutil.rmtree(directory_name)
