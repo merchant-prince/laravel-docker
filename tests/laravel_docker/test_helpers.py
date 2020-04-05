@@ -88,57 +88,16 @@ class TestQuestion(TestCase):
 class TestValidators(TestCase):
 
 
-    def test_an_alphabetic_value_is_accepted(self):
-        value = "thisisAlphabetic"
-        Validation.is_alphabetic(value)
+    def test_a_value_is_not_accepted_if_it_is_not_pascalcased(self):
+        project_name = "le-projectname"
+
+        self.assertRaises(ValueError, Validation.is_pascalcased, project_name)
 
 
-    def test_a_non_alphabetic_value_is_not_accepted(self):
-        value = "non44alpha00Betic55"
-        self.assertRaises(ValueError, Validation.is_alphabetic, value)
+    def test_a_value_is_accepted_if_it_is_pascalcased(self):
+        project_name = "LeProjectname"
 
-
-    def test_an_alphanumeric_value_is_accepted(self):
-        value = "thisisalphaNumeric001"
-        Validation.is_alphanumeric(value)
-
-
-    def test_a_non_alphanumeric_value_is_not_accepted(self):
-        value = "this is not alphanumeric 4554"
-        self.assertRaises(ValueError, Validation.is_alphanumeric, value)
-
-
-    def test_a_string_consisting_of_digits_only_is_accepted(self):
-        value = "1234566"
-        Validation.is_digit(value)
-
-
-    def test_a_string_not_consisting_of_digits_only_is_not_accepted(self):
-        value = "3550a"
-        self.assertRaises(ValueError, Validation.is_digit, value)
-
-
-    def test_a_string_consisting_of_lowercase_characters_only_is_accepted(self):
-        value = "thisislowercase"
-        Validation.is_lowercase(value)
-
-
-    def test_a_string_consisting_of_mixed_case_characters_is_not_accepted(self):
-        value = "ThisIsMixedCase"
-        self.assertRaises(ValueError, Validation.is_lowercase, value)
-
-
-    def test_a_string_longer_than_the_minimum_length_specified_is_accepted(self):
-        length = 10
-        value = "z" * (length + 1)
-        validator = Validation.min_length(length)
-        validator(value)
-
-
-    def test_a_string_shorter_than_the_minimum_length_specified_is_not_accepted(self):
-        length = 10
-        value = "a" * (length - 1)
-        self.assertRaises(ValueError, Validation.min_length(length), value)
+        Validation.is_pascalcased(project_name)
 
 
     def test_a_value_is_not_accepted_if_the_cwd_contains_a_directory_with_the_same_name(self):

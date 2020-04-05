@@ -15,10 +15,8 @@ class Question:
             e.g.: "What is your name?"
 
         validators ([callable]):
-            The validation functions. This is an array of lambda functions which
-            return a ValueError when the validation fails, and the answer
-            otherwise.
-            e.g.: lambda a: a if len(a) < 33 else ValueError("Oops...")
+            The validation functions. This is an array of callable objects which
+            raise a ValueError when the validation fails.
 
         default_answer (str):
             The default answer to the question. This is used if the user enters
@@ -33,7 +31,7 @@ class Question:
     """
 
 
-    def __init__(self, question, validators = [lambda a: a], default_answer = None, max_tries = 3):
+    def __init__(self, question, validators = [lambda a: None], default_answer = None, max_tries = 3):
         self._question = question
         self._max_tries = max_tries
         self._default_answer = default_answer
@@ -76,7 +74,7 @@ class Question:
             raise ValueError("You have entered the wrong input too many times.")
 
 
-    def _ask_question(self, question, default_answer = None):
+    def _ask_question(self, question, default_answer):
         """
         Ask a question with a default answer.
 
@@ -113,30 +111,6 @@ class Validation:
 
 
     @staticmethod
-    def is_alphabetic(value):
-        if not value.isalpha():
-            raise ValueError(f"The provided value is not alphabetic.")
-
-
-    @staticmethod
-    def is_alphanumeric(value):
-        if not value.isalnum():
-            raise ValueError("The provided value is not alphanumeric.")
-
-
-    @staticmethod
-    def is_digit(value):
-        if not value.isdigit():
-            raise ValueError("The provided value does not contain digits only.")
-
-
-    @staticmethod
-    def is_lowercase(value):
-        if value.lower() != value:
-            raise ValueError(f"The provided value is not lowercase.")
-
-
-    @staticmethod
     def is_pascalcased(value):
         if re.match(r'^[A-Z][a-z]+(?:[A-Z][a-z]+)*$', value) is None:
             raise ValueError("The provided value is not PascalCased")
@@ -156,15 +130,6 @@ class Validation:
 
         if re.match(url_regex, f"https://{value}") is None:
             raise ValueError("The provided value is not a valid domain.")
-
-
-    @staticmethod
-    def min_length(length):
-        def minimum_length_validator(value):
-            if len(value) < length:
-                raise ValueError(f"The provided value should be longer than {length} characters.")
-
-        return minimum_length_validator
 
 
 
@@ -227,6 +192,21 @@ class Parser:
 
 
     def parse(self,variables = {}, delimiters_creator = lambda variable_name: f"[[{variable_name}]]"):
+        """
+        Parse the stored template with the provided variables through the
+        delimiters_creator.
+
+        Args:
+            variables (dict):
+                The variables replace in the template. They are passed through
+                the delimiters_creator callable to create a token which is
+                searched and replaced throughout the template.
+
+            delimiters_creator (callable):
+                The function through which the variable keys are passed to
+                return a token - which is replaced throughout the template.
+        """
+
         if not isinstance(variables, Mapping):
             raise ValueError("The variables argument should be a Mapping (dict).")
 
@@ -284,7 +264,6 @@ class PrettyLog:
             eols_after (int):
                 The number of EOLs to insert after the message.
         """
-
 
         if position not in ["before", "after"]:
             raise ValueError("Invalid position provided.")
