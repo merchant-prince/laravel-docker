@@ -43,9 +43,7 @@ RUN touch /var/log/application.cron.log \
  && chown www-data:www-data /var/log/application.cron.log \
  && echo "* * * * *    www-data    php /var/www/html/artisan schedule:run >> /var/log/application.cron.log 2>&1" >> /etc/crontab
 
-VOLUME [ "/var/www/html" ]
-
-COPY entrypoint.sh /home/www-data/custom-entrypoint.sh
+VOLUME [ "/var/www/html", "/home/www-data/custom-entrypoint.sh" ]
 
 ENTRYPOINT [ "/home/www-data/custom-entrypoint.sh" ]
 

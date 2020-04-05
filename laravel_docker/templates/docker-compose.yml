@@ -27,6 +27,7 @@ services:
                 - USER_ID
                 - GROUP_ID
         volumes:
+            - ./dockerfiles/php/entrypoint.sh:/home/www-data/custom-entrypoint.sh:ro
             - ./application/${PROJECT_NAME}:/var/www/html
         restart: always
         networks:
