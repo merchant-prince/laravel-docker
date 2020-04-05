@@ -1,8 +1,8 @@
 import os
 from unittest import TestCase
 import tests.helpers as helpers
-from scripting_utilities.cd import ChangeDirectory
-from laravel_docker.core import ProjectEnvironment, ProjectConfiguration
+from scripting_utilities import ChangeDirectory
+from laravel_docker.core import ProjectConfiguration, ProjectEnvironment
 
 
 class TestProjectEnvironment(TestCase):

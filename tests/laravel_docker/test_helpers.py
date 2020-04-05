@@ -4,8 +4,8 @@ from io import StringIO
 from pathlib import Path
 from unittest import TestCase
 import tests.helpers as helpers
-from scripting_utilities.cd import ChangeDirectory
-from laravel_docker.helpers import Question, Validation, Parser, PrettyLog
+from scripting_utilities import ChangeDirectory
+from laravel_docker.helpers import Parser, PrettyLog, Question, Validation
 
 
 class TestQuestion(TestCase):

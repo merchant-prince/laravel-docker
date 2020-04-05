@@ -3,7 +3,7 @@ import stat
 import fileinput
 from subprocess import run
 from collections.abc import Mapping
-from scripting_utilities.cd import ChangeDirectory
+from scripting_utilities import ChangeDirectory
 from laravel_docker.helpers import Parser, Question, Validation
 
 
@@ -101,8 +101,8 @@ class ProjectConfiguration:
 
     Attributes:
         _configuration (dict):
-            The configuration / environment variables of the project. This
-            dict SHOULD NOT BE ALTERED.
+            The configuration / environment variables of the project.
+            This dict SHOULD NOT BE ALTERED.
     """
 
 
@@ -282,7 +282,7 @@ class Env:
                     items = [word for word in line.split("=", 1)]
 
                     if len(items) == 1:
-                        items.append(None)
+                        items.append("")
 
                     key, value = items
 

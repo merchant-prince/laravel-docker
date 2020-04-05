@@ -1,6 +1,5 @@
 from laravel_docker.helpers import PrettyLog
-from scripting_utilities.cd import ChangeDirectory
-from scripting_utilities.skeleton import CreateSkeleton
+from scripting_utilities import ChangeDirectory, CreateSkeleton
 from laravel_docker.core import Env, Git, LaravelInstaller, ProjectConfiguration, ProjectEnvironment
 
 

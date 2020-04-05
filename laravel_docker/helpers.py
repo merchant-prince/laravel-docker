@@ -1,7 +1,8 @@
 import os
 import re
+import readline
 from collections.abc import Mapping
-from scripting_utilities.print import Print
+from scripting_utilities import Print
 
 
 class Question:
@@ -33,10 +34,10 @@ class Question:
 
 
     def __init__(self, question, validators = [lambda a: a], default_answer = None, max_tries = 3):
-        self.question = question
-        self.max_tries = max_tries
-        self.default_answer = default_answer
-        self.answer = None
+        self._question = question
+        self._max_tries = max_tries
+        self._default_answer = default_answer
+        self._answer = None
 
         for validator in validators:
             if not callable(validator):
@@ -52,17 +53,17 @@ class Question:
         Ask the question to the user.
         """
 
-        for try_count in range(0, self.max_tries):
-            answer = input(f"{self.question}{f' [{self.default_answer}]' if self.default_answer is not None else ''}: ")
+        for try_count in range(0, self._max_tries):
+            answer = self._ask_question(f"{self._question}: ", self._default_answer)
 
-            if answer == '' and self.default_answer is not None:
-                answer = self.default_answer
+            if answer == '' and self._default_answer is not None:
+                answer = self._default_answer
 
             try:
                 for validator in self.validators:
                     validator(answer)
 
-                self.answer = answer
+                self._answer = answer
             except ValueError as exception:
                 Print.eol()
                 Print.warning(exception)
@@ -75,8 +76,24 @@ class Question:
             raise ValueError("You have entered the wrong input too many times.")
 
 
+    def _ask_question(self, question, default_answer = None):
+        """
+        Ask a question with a default answer.
+
+        Args:
+            question (str)
+            default_answer (str)
+        """
+        readline.set_startup_hook(lambda: readline.insert_text(default_answer))
+
+        try:
+            return input(question)
+        finally:
+            readline.set_startup_hook()
+
+
     def __str__(self):
-        return self.answer
+        return self._answer
 
 
 
