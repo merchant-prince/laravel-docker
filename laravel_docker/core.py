@@ -47,6 +47,8 @@ class ProjectEnvironment:
                 }
             },
             "application": {
+                # The keys defined here will replace the associated ones defined
+                # in the .env file of the application (laravel).
                 "environment": {
                     "APP_NAME": None,
                     "APP_URL": None,
@@ -56,7 +58,14 @@ class ProjectEnvironment:
                     "DB_PORT": 5432,
                     "DB_DATABASE": "application",
                     "DB_USERNAME": "username",
-                    "DB_PASSWORD": "password"
+                    "DB_PASSWORD": "password",
+
+                    "CACHE_DRIVER": "redis",
+                    "SESSION_DRIVER": "redis",
+                    "QUEUE_CONNECTION": "redis",
+
+                    "REDIS_HOST": "redis",
+                    "REDIS_PORT": 6379
                 }
             }
         }

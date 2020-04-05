@@ -7,6 +7,8 @@ RUN apt-get update \
  && docker-php-ext-install bcmath pdo_pgsql pgsql pcntl zip \
  && docker-php-ext-configure pgsql \
  && docker-php-ext-configure zip \
+ && pecl install redis \
+ && docker-php-ext-enable redis \
  && apt autoremove \
  && rm -rf /var/lib/apt/lists/*
 

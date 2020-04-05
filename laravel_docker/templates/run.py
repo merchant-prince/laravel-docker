@@ -42,7 +42,7 @@ if __name__ == "__main__":
     parsed = parser.parse_args()
 
     if parsed.tool == "artisan":
-        run(["docker-compose", "exec", "php", "php", "artisan"] + parsed.arguments)
+        run(["docker-compose", "exec", "--user", "www-data", "php", "php", "artisan"] + parsed.arguments)
 
     elif parsed.tool == "composer":
         run(["docker", "run", "--rm",
@@ -63,7 +63,7 @@ if __name__ == "__main__":
                               f"node:{env['NODE_IMAGE_TAG']}", "yarn"] + parsed.arguments)
 
     elif parsed.tool == "phpunit":
-        run(["docker-compose", "exec", "php", "php", "./vendor/bin/phpunit"] + parsed.arguments)
+        run(["docker-compose", "exec", "--user", "www-data", "php", "php", "./vendor/bin/phpunit"] + parsed.arguments)
 
     else:
         parser.print_help()
