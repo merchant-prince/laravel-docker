@@ -224,14 +224,24 @@ class ProjectConfiguration:
             # run.py
             (Parser().read_template(Parser.template_path("run.py"))
                      .parse()
-                     .output("run.py"))
+                     .output("run"))
 
-            os.chmod("run.py", os.stat("run.py").st_mode | stat.S_IEXEC)
+            os.chmod("run", os.stat("run").st_mode | stat.S_IEXEC)
 
             # .gitignore
             (Parser().read_template(Parser.template_path("project.gitignore"))
                      .parse()
                      .output(".gitignore"))
+
+            # LICENSE
+            (Parser().read_template(Parser.template_path("LICENSE"))
+                     .parse()
+                     .output("LICENSE"))
+
+            # README.md
+            (Parser().read_template(Parser.template_path("README.md"))
+                     .parse()
+                     .output("README.md"))
 
 
 
