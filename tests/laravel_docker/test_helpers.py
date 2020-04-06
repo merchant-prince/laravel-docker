@@ -65,8 +65,8 @@ class TestQuestion(TestCase):
         try:
             with helpers.suppressed_stdout(), helpers.send_input(f"{wrong_answer}\n" * max_tries):
                 Question(question_string, validators, None, max_tries)
-        except ValueError:
-            self.assertTrue(True)
+        except:
+            pass
         else:
             self.assertTrue(False, "The expected ValueError was not raised.")
 
@@ -101,21 +101,17 @@ class TestValidators(TestCase):
 
 
     def test_a_value_is_not_accepted_if_the_cwd_contains_a_directory_with_the_same_name(self):
-        project_name = "TheAwesomeProjectTest"
+        with helpers.temporary_directory():
+            project_name = "TheAwesomeProjectTest"
 
-        with ChangeDirectory("/tmp"):
-            try:
-                os.mkdir(project_name)
-                self.assertRaises(ValueError, Validation.directory_existence, project_name)
-            finally:
-                os.rmdir(project_name)
+            os.mkdir(project_name)
+
+            self.assertRaises(ValueError, Validation.directory_existence, project_name)
 
 
     def test_a_value_is_accepted_if_the_cwd_does_not_contain_a_directory_with_the_same_name(self):
-        project_name = "TheAwesomeProjectThatDoesNotExistTest"
-
-        with ChangeDirectory("/tmp"):
-            Validation.directory_existence(project_name)
+        with helpers.temporary_directory():
+            Validation.directory_existence("TheAwesomeProjectThatDoesNotExistTest")
 
 
     def test_a_correctly_formatted_url_is_accepted(self):
@@ -144,25 +140,17 @@ class TestParser(TestCase):
 
 
     def test_a_template_is_read(self):
-        project_name = "TheAwesomeProjectWithAnAwesomeName"
+        with helpers.temporary_directory():
+            template_name = "template.txt"
+            template_string = "This is the template string."
 
-        with ChangeDirectory("/tmp"):
-            try:
-                os.mkdir(project_name)
+            with open(template_name, "w") as template:
+                template.write(template_string)
 
-                with ChangeDirectory(project_name):
-                    template_name = "template.txt"
-                    template_string = "This is the template string."
+            parser = Parser()
+            parser.read_template(template_name)
 
-                    with open(template_name, "w") as template:
-                        template.write(template_string)
-
-                    parser = Parser()
-                    parser.read_template(template_name)
-
-                    self.assertEqual(parser._raw_template_string, template_string)
-            finally:
-                shutil.rmtree(project_name)
+            self.assertEqual(parser._raw_template_string, template_string)
 
 
     def test_a_template_string_is_added(self):
@@ -195,15 +183,17 @@ class TestParser(TestCase):
 
 
     def test_parser_will_throw_an_error_if_there_are_remaining_variables_in_the_parsed_template(self):
-        template_string = "This is the template string with [[LE_VAR]] and [[MORE_VARS]]."
-        variables = {
-            "LE_VAR": "this variable"
+        templates_and_delimiters_creator = {
+            "This is the template string with [[LE_VAR]] and [[MORE_VARS]].": lambda d: f"[[{d}]]",
+            "This is the template string with {{LE_VAR}} and {{MORE_VARS}}.": lambda d: f"{{{{{d}}}}}",
+            "This is the template string with ||LE_VAR|| and ||MORE_VARS||.": lambda d: f"||{d}||"
         }
         parser = Parser()
 
-        parser.add_template_string(template_string)
+        for template, delimiters_creator in templates_and_delimiters_creator.items():
+            parser.add_template_string(template)
 
-        self.assertRaises(ValueError, parser.parse, variables)
+            self.assertRaises(ValueError, parser.parse, {}, delimiters_creator)
 
 
     def test_a_template_is_successfully_parsed_with_the_default_delimiters_creator_if_the_correct_variables_mapping_is_provided(self):
@@ -241,23 +231,16 @@ class TestParser(TestCase):
             "NAME": "Harivansh",
             "EMAIL": "hello@harivan.sh"
         }
-        project_name = "TheAwesomeProjectWithAnAwesomeName"
         output_filename = "output.txt"
 
-        with ChangeDirectory("/tmp"):
-            try:
-                os.mkdir(project_name)
+        with helpers.temporary_directory():
+            Path(output_filename).touch()
 
-                with ChangeDirectory(project_name):
-                    Path(output_filename).touch()
+            parser = Parser()
 
-                    parser = Parser()
+            parser.add_template_string(template_string).parse(variables)
 
-                    parser.add_template_string(template_string).parse(variables)
-
-                    self.assertRaises(ValueError, parser.output, output_filename)
-            finally:
-                shutil.rmtree(project_name)
+            self.assertRaises(ValueError, parser.output, output_filename)
 
 
     def test_the_output_file_is_written_to_the_specified_path(self):
@@ -267,25 +250,18 @@ class TestParser(TestCase):
             "EMAIL": "hello@harivan.sh"
         }
         expected_parsed_template_string = "The user's name is Harivansh and his email is hello@harivan.sh."
-        project_name = "TheAwesomeProjectWithAnAwesomeName"
         output_filename = "output.txt"
 
-        with ChangeDirectory("/tmp"):
-            try:
-                os.mkdir(project_name)
+        with helpers.temporary_directory():
+            (Parser()
+                .add_template_string(template_string)
+                .parse(variables)
+                .output(output_filename))
 
-                with ChangeDirectory(project_name):
-                    (Parser()
-                        .add_template_string(template_string)
-                        .parse(variables)
-                        .output(output_filename))
+            with open(output_filename) as output:
+                output_file_contents = output.read()
 
-                    with open(output_filename) as output:
-                        output_file_contents = output.read()
-
-                    self.assertEqual(output_file_contents, expected_parsed_template_string)
-            finally:
-                shutil.rmtree(project_name)
+            self.assertEqual(output_file_contents, expected_parsed_template_string)
 
 
 

@@ -1,7 +1,11 @@
 import os
 import sys
+import random
+import shutil
+import string
 from io import StringIO
 from contextlib import contextmanager
+from scripting_utilities import ChangeDirectory
 
 
 @contextmanager
@@ -49,3 +53,24 @@ def raise_exception(exception):
     """
 
     raise exception
+
+
+@contextmanager
+def temporary_directory(name = "".join(random.choices(string.ascii_lowercase, k = 64))):
+    """
+    Create and cd into a temporary directory.
+    The aforementioned is removed when the context is exited.
+
+    Args:
+        name (str):
+            The name of the temporary directory.
+    """
+
+    with ChangeDirectory("/tmp"):
+        try:
+            os.mkdir(name)
+
+            with ChangeDirectory(name):
+                yield
+        finally:
+            shutil.rmtree(name)

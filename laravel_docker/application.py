@@ -1,6 +1,7 @@
+from subprocess import run
 from laravel_docker.helpers import PrettyLog
 from scripting_utilities import ChangeDirectory, CreateSkeleton
-from laravel_docker.core import Env, Git, LaravelInstaller, ProjectConfiguration, ProjectEnvironment, Ssl
+from laravel_docker.core import Env, LaravelInstaller, ProjectConfiguration, ProjectEnvironment, Ssl
 
 
 class Application:
@@ -131,8 +132,16 @@ class Application:
         Initialize a git repository in the project root directory.
         """
 
+        git_commands = [
+            ["git", "init"],
+            ["git", "add", "."],
+            ["git", "commit", "-m", "initial commit"],
+            ["git", "checkout", "-b", "development"]
+        ]
+
         with ChangeDirectory(self._configuration["project"]["name"]):
-            Git.initialize()
+            for git_command in git_commands:
+                run(git_command, check = True)
 
 
     @PrettyLog.message("Editing the application's environment file.")

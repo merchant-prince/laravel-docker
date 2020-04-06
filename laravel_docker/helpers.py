@@ -1,5 +1,7 @@
 import os
 import re
+import random
+import string
 import readline
 from collections.abc import Mapping
 from scripting_utilities import Print
@@ -119,12 +121,12 @@ class Validation:
     @staticmethod
     def is_url(value):
         url_regex = re.compile(
-            r'^(?:http|ftp)s?://' # http:// or https://
-            r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|' #domain...
-            r'localhost|' #localhost...
-            r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})' # ...or ip
-            r'(?::\d+)?' # optional port
-            r'(?:/?|[/?]\S+)$',
+            r'^'
+                r'(?:http|ftp)s?://' # scheme
+                r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?))' # domain
+                r'(?::\d+)?' # port (optional)
+                r'(?:/?|[/?]\S+)' # path
+            r'$',
             re.IGNORECASE
         )
 
@@ -218,7 +220,11 @@ class Parser:
         for name, value in variables.items():
             parsed_template = parsed_template.replace(delimiters_creator(name), str(value))
 
-        if re.match(r'.*\[\[[A-Z][A-Z0-9_]+\]\].*', parsed_template) is not None:
+        unique_token = "".join(random.choices(f"{string.ascii_uppercase}_", k = 64))
+        # The following regex is created according to the delimiters_creator passed to this method.
+        token_regex = re.compile(r".*" + re.escape(delimiters_creator(unique_token)).replace(unique_token, r"\w[\w_]*") + r".*")
+
+        if token_regex.match(parsed_template) is not None:
             raise ValueError("There are still unparsed variables in the template.")
 
         self._parsed_template_string = parsed_template
@@ -227,6 +233,14 @@ class Parser:
 
 
     def output(self, file_path):
+        """
+        Write the contents of the parsed template string to the specified file.
+
+        Args:
+            file_path (str):
+                The path to the file in which the parsed template should be written.
+        """
+
         if os.path.isfile(file_path):
             raise ValueError("Another file with the same name already exists.")
 
@@ -251,16 +265,20 @@ class PrettyLog:
         Args:
             message (str):
                 The message to print.
+
             type (str):
                 The type of print function to use. It should be one of the
                 following:
                     ["success", "info", "warning", "error"]
+
             position (str):
                 Where to print the message; i.e. before or after calling the
                 decorated function. The accepted values are:
                     ["before", "after"]
+
             eols_before (int):
                 The number of EOLs to insert before the message.
+
             eols_after (int):
                 The number of EOLs to insert after the message.
         """

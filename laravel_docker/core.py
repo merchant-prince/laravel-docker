@@ -1,3 +1,4 @@
+import re
 import os
 import stat
 import fileinput
@@ -7,7 +8,6 @@ from scripting_utilities import ChangeDirectory
 from laravel_docker.helpers import Parser, Question, Validation
 
 # The following imports are for the Ssl class.
-import ipaddress
 from cryptography import x509
 from datetime import datetime, timedelta
 from cryptography.x509.oid import NameOID
@@ -23,32 +23,41 @@ class ProjectEnvironment:
 
     Attributes:
         _configuration (dict):
-            A mapping containing the project configuration.
+            A mapping containing the project's environment configuration.
     """
 
 
     def __init__(self):
         self._configuration = {
+            # Project-level configuration values.
             "project": {
                 "name": None,
                 "domain": "application.local",
             },
+
+            # TLS/SSL configuration values.
             "ssl": {
                 "key_name": "key.pem",
                 "certificate_name": "certificate.pem"
             },
+
+            # Docker-compose environment values.
             "environment": {
                 "uid": os.geteuid(),
                 "gid": os.getegid()
             },
+
+            # Docker-compose service environment values.
             "services": {
                 "adminer": {
                     "port": 8080
                 }
             },
+
+            # The application (laravel) environment values.
             "application": {
                 # The keys defined here will replace the associated ones defined
-                # in the .env file of the application (laravel).
+                # in the .env file of the application.
                 "environment": {
                     "APP_NAME": None,
                     "APP_URL": None,
@@ -130,6 +139,7 @@ class ProjectConfiguration:
     Attributes:
         _configuration (dict):
             The configuration / environment variables of the project.
+            This property is the same as ProjectEnvironment._configuration.
             This dict SHOULD NOT BE ALTERED.
     """
 
@@ -233,8 +243,8 @@ class LaravelInstaller:
 
     Attributes:
         _configuration (dict):
-            The configuration / environment variables of the project. This
-            dict SHOULD NOT BE ALTERED.
+            The configuration / environment variables of the project.
+            This dict SHOULD NOT BE ALTERED.
     """
 
 
@@ -264,41 +274,27 @@ class LaravelInstaller:
 
 
 
-class Git:
-    """
-    Initialize a new git repository in the current directory.
-    """
-
-
-    @staticmethod
-    def initialize():
-        """
-        Initialize, create the first commit, and checkout to a new development
-        branch.
-        """
-
-        commands = [
-            ["git", "init"],
-            ["git", "add", "."],
-            ["git", "commit", "-m", "initial commit"],
-            ["git", "checkout", "-b", "development"]
-        ]
-
-        for command in commands:
-            run(command, check = True)
-
-
-
-
 class Env:
     """
     This class is responsible for the changes made to the application's
-    (laravel's) .env file.
+    (laravel) .env file.
+
+    Attributes:
+        _env_path (str):
+            The path to the application's (laravel) .env file.
     """
 
 
-    def __init__(self, file_path):
-        self._file_path = file_path
+    def __init__(self, env_path):
+        """
+        Class constructor.
+
+        Args:
+            env_path (str):
+                The file path to the application's (laravel) .env file.
+        """
+
+        self._env_path = env_path
 
 
     def replace(self, replacement):
@@ -313,22 +309,19 @@ class Env:
         if not isinstance(replacement, Mapping):
             raise ValueError("The replacement argument should be a Mapping.")
 
-        with fileinput.input(self._file_path, inplace = True) as env:
+        with fileinput.input(self._env_path, inplace = True) as env:
+            env_regex = re.compile(r"^(?P<key>\w+)=(?P<value>[\S]+)?\s*(?P<remaining>#.*)?$")
+
             for line in env:
                 line = line.strip()
+                matches = env_regex.match(line)
 
-                if line != "" and "=" in line:
-                    items = [word for word in line.split("=", 1)]
+                if matches is not None:
+                    matches = matches.groupdict()
+                    line = f"{matches['key']}={replacement[matches['key']] if matches['key'] in replacement else matches['value']}"
 
-                    if len(items) == 1:
-                        items.append("")
-
-                    key, value = items
-
-                    if key in replacement:
-                        value = replacement[key]
-
-                    line = f"{key}={value}"
+                    if matches['remaining']:
+                        line = f"{line}{' ' * 4}{matches['remaining']}"
 
                 print(line)
 
@@ -337,20 +330,25 @@ class Env:
 
 class Ssl:
     """
-    This class is responsible for creating x509 TLS/SSL certificates.
+    This class is responsible for creating x509 TLS/SSL certificates and
+    associated keys.
 
     Attributes:
         _hostname (str):
             The hostname of the machine on which the certificates will be hosted.
+
         _key_size (int):
             The size of the SSL key.
+
         _validity (int):
             The number number of days (since creation) for which the certificate
             will remain valid.
+
         _key (bytes):
-            The TLS key.
+            The TLS key content.
+
         _certificate (bytes):
-            The TLS certificate.
+            The TLS certificate content.
     """
 
 
@@ -420,6 +418,8 @@ class Ssl:
             certificate_path (str): The path where the certificate will be stored.
         """
 
-        with open(key_path, "wb") as key, open(certificate_path, "wb") as certificate:
+        with open(key_path, "wb") as key:
             key.write(self._key)
+
+        with open(certificate_path, "wb") as certificate:
             certificate.write(self._certificate)
