@@ -28,7 +28,7 @@ services:
                 - GROUP_ID
         volumes:
             - ./dockerfiles/php/entrypoint.sh:/home/www-data/custom-entrypoint.sh:ro
-            - ./configuration/php/custom-php.ini:/usr/local/etc/php/conf.d/custom-php.ini:ro # only valid if PHP_INI_DIR=/usr/local/etc/php
+            - ./configuration/php/custom-php.ini:${PHP_INI_DIR}/conf.d/custom-php.ini:ro
             - ./application/${PROJECT_NAME}:/var/www/html
         restart: always
         networks:
