@@ -1,0 +1,1 @@
+from laravel_docker.application import Application

@@ -18,6 +18,10 @@ The sole purpose of this project is to automate the installation of a
 
 @todo: add
 
+### Requirements
+
+@todo: add
+
 ## Configuration
 
 @todo: add

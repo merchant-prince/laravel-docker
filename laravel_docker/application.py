@@ -1,7 +1,7 @@
 from subprocess import run
 from laravel_docker.helpers import PrettyLog
-from scripting_utilities import ChangeDirectory, CreateSkeleton
-from laravel_docker.core import Env, LaravelInstaller, ProjectConfiguration, ProjectEnvironment, Ssl
+from scripting_utilities import ChangeDirectory
+from laravel_docker.core import CreateSkeleton, Env, LaravelInstaller, ProjectConfiguration, ProjectEnvironment, Ssl
 
 
 class Application:
