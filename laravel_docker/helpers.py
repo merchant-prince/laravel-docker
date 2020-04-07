@@ -12,23 +12,23 @@ class Question:
     This class is used to ask questions to the user.
 
     Attributes:
-        question (string):
+        _question (string):
             The question to ask.
             e.g.: "What is your name?"
 
-        validators ([callable]):
+        _validators ([callable]):
             The validation functions. This is an array of callable objects which
             raise a ValueError when the validation fails.
 
-        default_answer (str):
+        _default_answer (str):
             The default answer to the question. This is used if the user enters
             an EOL as the first character to the question.
 
-        max_tries (int):
+        _max_tries (int):
             The maximum number of times to try a question if its validation
             fails.
 
-        answer (str):
+        _answer (str):
             The answer to the question as entered by the user.
     """
 
@@ -252,8 +252,7 @@ class Parser:
 
 class PrettyLog:
     """
-    This class contains decorators to output messages to stdout during the
-    installation process.
+    This class contains decorators to output messages to stdout.
     """
 
 
