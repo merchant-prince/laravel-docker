@@ -5,7 +5,7 @@ cffi==1.14.0
 chardet==3.0.4
 cryptography==2.9
 docutils==0.16
-harivansh-scripting-utilities==0.1.1
+harivansh-scripting-utilities==0.2.0
 idna==2.9
 isort==4.3.21
 jeepney==0.4.3
