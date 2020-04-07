@@ -23,6 +23,7 @@ setup(
     ],
     keywords = "laravel docker",
     packages = find_packages(),
+    package_data = {"templates": ["templates/*"]},
     python_requires = '>=3.8',
     install_requires = [
         "cryptography",

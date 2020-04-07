@@ -33,3 +33,17 @@ The sole purpose of this project is to automate the installation of a
 ## FAQ
 
 @todo: add
+
+## Build
+
+@todo: add
+
+## Test
+
+### Test Locally
+
+```python
+pip install -e .
+```
+
+@todo: add
