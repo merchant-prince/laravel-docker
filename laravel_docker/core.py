@@ -337,7 +337,9 @@ class ProjectConfiguration:
 
             # README.md
             (Parser().read_template(Parser.template_path("README.md"))
-                     .parse()
+                     .parse({
+                         "PROJECT_NAME": self._configuration["project"]["name"],
+                     })
                      .output("README.md"))
 
 

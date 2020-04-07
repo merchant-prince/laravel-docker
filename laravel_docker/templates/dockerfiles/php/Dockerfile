@@ -17,7 +17,7 @@ RUN cp "${PHP_INI_DIR}/php.ini-development" "${PHP_INI_DIR}/php.ini"
 
 ###                                                                    ###
 # Change the UID and GID of the www-data so that there are no permission #
-# conflicts on the files manipulated by the container on the host.       #
+# conflicts on the files manipulated by the container.                   #
 ###                                                                    ###
 
 ARG USER_ID

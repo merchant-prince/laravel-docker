@@ -38,6 +38,7 @@ def send_input(value):
     Args:
         value (str): The string to pass to stdin
     """
+
     original_stdin = sys.stdin
     sys.stdin = StringIO(value)
 

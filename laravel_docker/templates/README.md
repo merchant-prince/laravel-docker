@@ -93,6 +93,7 @@ It supports the following commands:
 ```sh
 # ARTISAN
 # To run any artisan command
+# The php service needs to be running for the following command to work
 
 ./run artisan COMMAND [ARGS]
 
@@ -117,6 +118,7 @@ It supports the following commands:
 
 # PHPUNIT
 # To run any tests defined in the /tests directory of the Laravel project
+# The php service needs to be running for the following command to work
 
 ./run phpunit [COMMAND [ARGS]]
 
@@ -125,6 +127,5 @@ It supports the following commands:
 
 ## FAQ
 
-This section shows the FAQ of the application.
-
-Visit [makeareadme](https://www.makeareadme.com) for a more detailed explanation on creating readmes.
+Visit [makeareadme](https://www.makeareadme.com) for a detailed explanation on
+creating readmes.
