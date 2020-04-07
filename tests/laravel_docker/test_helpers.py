@@ -2,8 +2,8 @@ import os
 import shutil
 from io import StringIO
 from pathlib import Path
+from tests import helpers
 from unittest import TestCase
-import tests.helpers as helpers
 from scripting_utilities import ChangeDirectory
 from laravel_docker.helpers import Parser, PrettyLog, Question, Validation
 

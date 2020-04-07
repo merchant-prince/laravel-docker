@@ -5,3 +5,7 @@ laravel_docker/__pycache__/
 
 tests/__pycache__/
 tests/laravel_docker/__pycache__/
+
+build/
+dist/
+harivansh_laravel_docker.egg-info

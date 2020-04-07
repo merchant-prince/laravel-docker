@@ -3,8 +3,8 @@ import copy
 import random
 import shutil
 import string
+from tests import helpers
 from unittest import TestCase
-import tests.helpers as helpers
 from scripting_utilities import ChangeDirectory
 from laravel_docker.application import Application
 from laravel_docker.core import CreateSkeleton, Env, ProjectConfiguration, ProjectEnvironment, Ssl
