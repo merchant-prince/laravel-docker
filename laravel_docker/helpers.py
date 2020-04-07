@@ -115,7 +115,7 @@ class Validation:
     @staticmethod
     def is_pascalcased(value):
         if re.match(r'^[A-Z][a-z]+(?:[A-Z][a-z]+)*$', value) is None:
-            raise ValueError("The provided value is not PascalCased")
+            raise ValueError("The provided value is not PascalCased alphabetic string.")
 
 
     @staticmethod
