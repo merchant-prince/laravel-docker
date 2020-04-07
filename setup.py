@@ -6,7 +6,7 @@ with open("README.md", "r") as readme:
 
 setup(
     name = "harivansh-laravel-docker",
-    version = "0.2.0",
+    version = "0.2.1",
     description = "A package to automate the installation of Laravel projects on Docker.",
     long_description = long_description,
     long_description_content_type = "text/markdown",
@@ -23,7 +23,7 @@ setup(
     ],
     keywords = "laravel docker",
     packages = find_packages(),
-    package_data = {"templates": ["templates/*"]},
+    include_package_data = True,
     python_requires = '>=3.8',
     install_requires = [
         "cryptography",
