@@ -94,7 +94,7 @@ class TestCreateSkeleton(TestCase):
         ]
 
         for structure in validStructures:
-            self.assertTrue(CreateSkeleton._isValid(structure))
+            self.assertTrue(CreateSkeleton._is_valid(structure))
 
 
     def test_returns_false_when_invalid_structure_provided(self):
@@ -105,7 +105,7 @@ class TestCreateSkeleton(TestCase):
         ]
 
         for structure in invalidStructures:
-            self.assertFalse(CreateSkeleton._isValid(structure))
+            self.assertFalse(CreateSkeleton._is_valid(structure))
 
 
     def test_does_not_raise_exception_on_valid_structure_validation(self):
