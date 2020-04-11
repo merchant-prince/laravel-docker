@@ -1,17 +1,12 @@
 import os
-import copy
-import random
-import shutil
-import string
-from tests import utils
 from unittest import TestCase
-from scripting_utilities import ChangeDirectory
-from laravel_docker.application import Application
-from laravel_docker.core import CreateSkeleton, Env, ProjectConfiguration, ProjectEnvironment, Ssl
+
+from harivansh_scripting_utilities.helpers import cd, capturestdout, injectstdin, tmpdir
+
+from laravel_docker.core import CreateSkeleton, Env, ProjectEnvironment, Ssl
 
 
 class TestProjectEnvironment(TestCase):
-
 
     def test_environment_uid_and_gid_are_correctly_set(self):
         project_environment = ProjectEnvironment()
@@ -19,97 +14,67 @@ class TestProjectEnvironment(TestCase):
         self.assertEqual(project_environment.get()["environment"]["uid"], os.geteuid())
         self.assertEqual(project_environment.get()["environment"]["gid"], os.getegid())
 
-
     def test_a_non_pascal_cased_project_name_is_rejected(self):
         project_environment = ProjectEnvironment()
         project_name = "project-one"
         max_tries = 3
 
-        with utils.suppressed_stdout(), utils.send_input(f"{project_name}\n" * max_tries):
+        with capturestdout(), injectstdin(f"{project_name}\n" * max_tries):
             self.assertRaises(ValueError, project_environment._query_project_name)
-
 
     def test_project_name_is_rejected_if_cwd_has_a_directory_with_the_same_name(self):
         project_name = "TheAwesomeProjectWithAnAwesomeName"
 
-        with utils.temporary_directory():
+        with tmpdir():
             os.mkdir(project_name)
 
             project_environment = ProjectEnvironment()
             max_tries = 3
 
-            with utils.suppressed_stdout(), utils.send_input(f"{project_name}\n" * max_tries):
+            with capturestdout(), injectstdin(f"{project_name}\n" * max_tries):
                 self.assertRaises(ValueError, project_environment._query_project_name)
-
 
     def test_a_pascal_cased_non_existent_project_name_is_accepted(self):
         project_environment = ProjectEnvironment()
         project_name = "CorrectProjectName"
 
-        with utils.suppressed_stdout(), utils.send_input(project_name):
+        with capturestdout(), injectstdin(project_name):
             captured_project_name = project_environment._query_project_name()
 
         self.assertEqual(captured_project_name, project_name)
-
 
     def test_an_invalid_domain_is_not_accepted(self):
         project_environment = ProjectEnvironment()
         invalid_domain = "invalid domain.com"
         max_tries = 3
 
-        with utils.suppressed_stdout(), utils.send_input(f"{invalid_domain}\n" * max_tries):
+        with capturestdout(), injectstdin(f"{invalid_domain}\n" * max_tries):
             self.assertRaises(ValueError, project_environment._query_domain_name)
-
 
     def test_a_valid_domain_name_is_accepted(self):
         project_environment = ProjectEnvironment()
         domain = "application.local"
 
-        with utils.suppressed_stdout(), utils.send_input(domain):
+        with capturestdout(), injectstdin(domain):
             captured_domain = project_environment._query_domain_name()
 
         self.assertEqual(captured_domain, domain)
-
 
     def test_a_null_value_defaults_to_the_provided_domain(self):
         project_environment = ProjectEnvironment()
         domain = "admin.application.local"
         project_environment._configuration["project"]["domain"] = domain
 
-        with utils.suppressed_stdout(), utils.send_input("\n"):
+        with capturestdout(), injectstdin("\n"):
             captured_domain = project_environment._query_domain_name()
 
         self.assertEqual(captured_domain, domain)
 
 
-
-
 class TestCreateSkeleton(TestCase):
 
-
-    def test_returns_true_when_valid_structure_is_provided(self):
-        validStructures = [
-            {},
-            ""
-        ]
-
-        for structure in validStructures:
-            self.assertTrue(CreateSkeleton._is_valid(structure))
-
-
-    def test_returns_false_when_invalid_structure_provided(self):
-        invalidStructures = [
-            (),
-            12,
-            []
-        ]
-
-        for structure in invalidStructures:
-            self.assertFalse(CreateSkeleton._is_valid(structure))
-
-
     def test_does_not_raise_exception_on_valid_structure_validation(self):
-        validStructure = {
+        valid_structure = {
             "directory_1": {},
             "file_1": "",
             "directory_2": {
@@ -120,11 +85,10 @@ class TestCreateSkeleton(TestCase):
             "file_2": ""
         }
 
-        self.assertTrue(CreateSkeleton._validate(validStructure) is None)
-
+        CreateSkeleton._validate(valid_structure)
 
     def test_raises_exceptions_on_invalid_structure_validation(self):
-        invalidStructure = {
+        invalid_structure = {
             "directory_1": {},
             "file_1": "",
             "directory_2": {
@@ -135,89 +99,52 @@ class TestCreateSkeleton(TestCase):
             "file_2": ()
         }
 
-        self.assertRaises(ValueError, CreateSkeleton._validate, invalidStructure)
-
+        self.assertRaises(ValueError, CreateSkeleton._validate, invalid_structure)
 
     def test_creates_skeleton_if_a_valid_structure_is_provided(self):
-        randomDirectoryName = ''.join(random.choices(string.ascii_uppercase, k = 32))
-        validStructure = {
-            randomDirectoryName: {
-                "directory_1": {},
-                "file_1": "",
-                "directory_2": {
-                    "inner_file_1": "",
-                    "inner_directory_1": {},
-                    "inner_file_2": ""
-                },
-                "file_2": ""
-            }
+        valid_structure = {
+            "directory_1": {},
+            "file_1": "",
+            "directory_2": {
+                "inner_file_1": "",
+                "inner_directory_1": {},
+                "inner_file_2": ""
+            },
+            "file_2": ""
         }
 
-        with utils.temporary_directory():
-            CreateSkeleton(validStructure)
+        with tmpdir():
+            CreateSkeleton(valid_structure)
 
-            self.assertTrue(os.path.isdir(randomDirectoryName))
+            self.assertTrue(os.path.isdir("directory_1"))
+            self.assertTrue(os.path.isfile("file_1"))
+            self.assertTrue(os.path.isdir("directory_2"))
 
-            with ChangeDirectory(randomDirectoryName):
-                self.assertTrue(os.path.isdir("directory_1"))
-                self.assertTrue(os.path.isfile("file_1"))
-                self.assertTrue(os.path.isdir("directory_2"))
+            with cd("directory_2"):
+                self.assertTrue(os.path.isfile("inner_file_1"))
+                self.assertTrue(os.path.isdir("inner_directory_1"))
+                self.assertTrue(os.path.isfile("inner_file_2"))
 
-                with ChangeDirectory("directory_2"):
-                    self.assertTrue(os.path.isfile("inner_file_1"))
-                    self.assertTrue(os.path.isdir("inner_directory_1"))
-                    self.assertTrue(os.path.isfile("inner_file_2"))
-
-                self.assertTrue(os.path.isfile("file_2"))
-
+            self.assertTrue(os.path.isfile("file_2"))
 
     def test_throws_an_exception_and_does_not_create_any_files_when_invalid_structure_provided(self):
-        randomDirectoryName = ''.join(random.choices(string.ascii_uppercase, k = 32))
-        invalidStructure = {
-            randomDirectoryName: {
-                "directory_1": [],
-                "file_1": "",
-                "directory_2": {
-                    "inner_file_1": 12,
-                    "inner_directory_1": {},
-                    "inner_file_2": ()
-                },
-                "file_2": ""
-            }
+        invalid_structure = {
+            "directory_1": [],
+            "file_1": "",
+            "directory_2": {
+                "inner_file_1": 12,
+                "inner_directory_1": {},
+                "inner_file_2": ()
+            },
+            "file_2": ""
         }
 
-        with utils.temporary_directory():
-            self.assertRaises(ValueError, CreateSkeleton, invalidStructure)
-            self.assertFalse(os.path.isdir(randomDirectoryName))
-
-
-
-
-class TestProjectConfiguration(TestCase):
-
-
-    def test_the_project_environment_configuration_is_not_altered_after_the_configuration_files_are_set(self):
-        project_name = "One"
-        domain_name = "application.one.com"
-
-        with utils.suppressed_stdout(), utils.send_input(f"{project_name}\n{domain_name}\n"):
-            configuration = ProjectEnvironment().initialize().get()
-
-        with utils.temporary_directory():
-            with utils.suppressed_stdout():
-                application = Application()
-                application._configuration = copy.deepcopy(configuration)
-                application._structure()
-
-            project_configuration = ProjectConfiguration(copy.deepcopy(configuration))
-
-            self.assertEqual(project_configuration._configuration, configuration)
-
-
+        with tmpdir():
+            self.assertRaises(ValueError, CreateSkeleton, invalid_structure)
+            self.assertFalse(os.listdir())
 
 
 class TestEnv(TestCase):
-
 
     def test_an_exception_is_thrown_if_the_replacement_argument_is_not_a_mapping(self):
         env_path = ".env"
@@ -227,9 +154,8 @@ class TestEnv(TestCase):
 
         self.assertRaises(ValueError, env.replace, replacement)
 
-
     def test_a_correctly_formatted_env_file_is_successfully_processed(self):
-        with utils.temporary_directory():
+        with tmpdir():
             env_filename = ".env"
             env_file_content = """
                 APP_NAME="OneTwo"
@@ -273,10 +199,7 @@ DB_PORT=5432
                 self.assertEqual(expected_env_file_content, actual_env_file_content[:-1])
 
 
-
-
 class TestSsl(TestCase):
-
 
     def test_ssl_certificates_are_successfully_written_to_the_specified_paths(self):
         key_directory = "ssl-key"
@@ -285,7 +208,7 @@ class TestSsl(TestCase):
         certificate_directory = "ssl-certificate"
         certificate_filename = "le-certificate"
 
-        with utils.temporary_directory():
+        with tmpdir():
             os.mkdir(key_directory)
             os.mkdir(certificate_directory)
 

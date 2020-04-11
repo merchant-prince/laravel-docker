@@ -112,7 +112,7 @@ class ProjectEnvironment:
             "Project name",
             [
                 Validation.is_pascalcase,
-                Validation.directory_exists()
+                Validation.directory_exists
             ]
         ))
 
@@ -228,7 +228,7 @@ class ProjectConfiguration:
                             "PROJECT_DOMAIN": self._configuration["project"]["domain"],
                             "SSL_KEY_NAME": self._configuration["ssl"]["key_name"],
                             "SSL_CERTIFICATE_NAME": self._configuration["ssl"]["certificate_name"]
-                        })
+                         })
                          .output("default.conf"))
 
                         # utils.conf
@@ -236,7 +236,7 @@ class ProjectConfiguration:
                          .parse({
                             "PROJECT_DOMAIN": self._configuration["project"]["domain"],
                             "ADMINER_PORT": self._configuration["services"]["adminer"]["port"]
-                        })
+                         })
                          .output("utils.conf"))
 
             with cd("dockerfiles"):
