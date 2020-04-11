@@ -17,7 +17,7 @@ class Question:
             The question to ask.
             e.g.: "What is your name?"
 
-        _validators ([callable]):
+        _validators ((callable,)):
             An array of validation functions which raise ValueErrors on failure.
 
         _default_answer (str):
@@ -31,7 +31,7 @@ class Question:
             The user's answer to the question.
     """
 
-    def __init__(self, question, validators=[lambda a: None], default_answer=None, max_tries=3):
+    def __init__(self, question, validators=(lambda a: None,), default_answer=None, max_tries=3):
         self._question = question
         self._max_tries = max_tries
         self._default_answer = default_answer

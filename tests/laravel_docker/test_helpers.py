@@ -21,12 +21,12 @@ class TestQuestion(TestCase):
 
     def test_an_exception_is_raised_if_any_of_the_validators_provided_is_not_a_callable(self):
         question_string = "What is your name?"
-        validator = [
+        validators = (
             lambda a: a,
             "wrong validator type"
-        ]
+        )
 
-        self.assertRaises(ValueError, Question, question_string, validator)
+        self.assertRaises(ValueError, Question, question_string, validators)
 
     def test_the_correct_error_message_is_displayed_on_validation_error(self):
         question_string = "What is your name?"
@@ -34,10 +34,10 @@ class TestQuestion(TestCase):
             "min": "This is the MINIMUM error message.",
             "max": "This is the MAXIMUM error message."
         }
-        validators = [
+        validators = (
             lambda a: None if len(a) > 3 else raise_(ValueError(error_message["min"])),
             lambda a: None if len(a) < 10 else raise_(ValueError(error_message["max"]))
-        ]
+        )
         answers = {
             "correct": "Harivansh",
             "wrong_min": "Hi",
@@ -55,7 +55,7 @@ class TestQuestion(TestCase):
 
     def test_an_exception_is_raised_if_a_question_is_unsuccessfully_answered_n_times(self):
         question_string = "What is your name?"
-        validators = [lambda a: a if len(a) < 3 else raise_(ValueError("Oops..."))]
+        validators = (lambda a: a if len(a) < 3 else raise_(ValueError("Oops...")),)
         wrong_answer = "Wrong Answer"
         max_tries = 5
 
@@ -69,7 +69,7 @@ class TestQuestion(TestCase):
 
     def test_the_answer_defaults_to_the_default_answer_if_no_input_is_provided_by_the_user(self):
         question_string = "What is your name?"
-        validators = [lambda a: a if len(a) < 20 else raise_(ValueError("Error message..."))]
+        validators = (lambda a: a if len(a) < 20 else raise_(ValueError("Error message...")),)
         answer = "\n"
         default_answer = "Hari Vansh"
 

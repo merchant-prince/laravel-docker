@@ -110,16 +110,16 @@ class ProjectEnvironment:
     def _query_project_name(self):
         return str(Question(
             "Project name",
-            [
+            (
                 Validation.is_pascalcase,
                 Validation.directory_exists
-            ]
+            )
         ))
 
     def _query_domain_name(self):
         return str(Question(
             "Project domain",
-            [Validation.is_url],
+            (Validation.is_url,),
             self._configuration["project"]["domain"]
         ))
 
@@ -299,7 +299,9 @@ class ProjectConfiguration:
 
             # README.md
             (Parser().read_template(Parser.template_path("README.md"))
-             .parse({"PROJECT_NAME": self._configuration["project"]["name"]})
+             .parse({
+                "PROJECT_NAME": self._configuration["project"]["name"]
+             })
              .output("README.md"))
 
 
