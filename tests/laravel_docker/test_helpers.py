@@ -5,7 +5,7 @@ from unittest import TestCase
 from harivansh_scripting_utilities.helpers import injectstdin, capturestdout, tmpdir
 
 from laravel_docker.helpers import log, Parser, Question, Validation
-from tests.helpers import raise_
+from tests.utils import raise_
 
 
 class TestQuestion(TestCase):

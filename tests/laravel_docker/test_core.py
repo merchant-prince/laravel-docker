@@ -3,7 +3,7 @@ import copy
 import random
 import shutil
 import string
-from tests import helpers
+from tests import utils
 from unittest import TestCase
 from scripting_utilities import ChangeDirectory
 from laravel_docker.application import Application
@@ -25,20 +25,20 @@ class TestProjectEnvironment(TestCase):
         project_name = "project-one"
         max_tries = 3
 
-        with helpers.suppressed_stdout(), helpers.send_input(f"{project_name}\n" * max_tries):
+        with utils.suppressed_stdout(), utils.send_input(f"{project_name}\n" * max_tries):
             self.assertRaises(ValueError, project_environment._query_project_name)
 
 
     def test_project_name_is_rejected_if_cwd_has_a_directory_with_the_same_name(self):
         project_name = "TheAwesomeProjectWithAnAwesomeName"
 
-        with helpers.temporary_directory():
+        with utils.temporary_directory():
             os.mkdir(project_name)
 
             project_environment = ProjectEnvironment()
             max_tries = 3
 
-            with helpers.suppressed_stdout(), helpers.send_input(f"{project_name}\n" * max_tries):
+            with utils.suppressed_stdout(), utils.send_input(f"{project_name}\n" * max_tries):
                 self.assertRaises(ValueError, project_environment._query_project_name)
 
 
@@ -46,7 +46,7 @@ class TestProjectEnvironment(TestCase):
         project_environment = ProjectEnvironment()
         project_name = "CorrectProjectName"
 
-        with helpers.suppressed_stdout(), helpers.send_input(project_name):
+        with utils.suppressed_stdout(), utils.send_input(project_name):
             captured_project_name = project_environment._query_project_name()
 
         self.assertEqual(captured_project_name, project_name)
@@ -57,7 +57,7 @@ class TestProjectEnvironment(TestCase):
         invalid_domain = "invalid domain.com"
         max_tries = 3
 
-        with helpers.suppressed_stdout(), helpers.send_input(f"{invalid_domain}\n" * max_tries):
+        with utils.suppressed_stdout(), utils.send_input(f"{invalid_domain}\n" * max_tries):
             self.assertRaises(ValueError, project_environment._query_domain_name)
 
 
@@ -65,7 +65,7 @@ class TestProjectEnvironment(TestCase):
         project_environment = ProjectEnvironment()
         domain = "application.local"
 
-        with helpers.suppressed_stdout(), helpers.send_input(domain):
+        with utils.suppressed_stdout(), utils.send_input(domain):
             captured_domain = project_environment._query_domain_name()
 
         self.assertEqual(captured_domain, domain)
@@ -76,7 +76,7 @@ class TestProjectEnvironment(TestCase):
         domain = "admin.application.local"
         project_environment._configuration["project"]["domain"] = domain
 
-        with helpers.suppressed_stdout(), helpers.send_input("\n"):
+        with utils.suppressed_stdout(), utils.send_input("\n"):
             captured_domain = project_environment._query_domain_name()
 
         self.assertEqual(captured_domain, domain)
@@ -153,7 +153,7 @@ class TestCreateSkeleton(TestCase):
             }
         }
 
-        with helpers.temporary_directory():
+        with utils.temporary_directory():
             CreateSkeleton(validStructure)
 
             self.assertTrue(os.path.isdir(randomDirectoryName))
@@ -186,7 +186,7 @@ class TestCreateSkeleton(TestCase):
             }
         }
 
-        with helpers.temporary_directory():
+        with utils.temporary_directory():
             self.assertRaises(ValueError, CreateSkeleton, invalidStructure)
             self.assertFalse(os.path.isdir(randomDirectoryName))
 
@@ -200,11 +200,11 @@ class TestProjectConfiguration(TestCase):
         project_name = "One"
         domain_name = "application.one.com"
 
-        with helpers.suppressed_stdout(), helpers.send_input(f"{project_name}\n{domain_name}\n"):
+        with utils.suppressed_stdout(), utils.send_input(f"{project_name}\n{domain_name}\n"):
             configuration = ProjectEnvironment().initialize().get()
 
-        with helpers.temporary_directory():
-            with helpers.suppressed_stdout():
+        with utils.temporary_directory():
+            with utils.suppressed_stdout():
                 application = Application()
                 application._configuration = copy.deepcopy(configuration)
                 application._structure()
@@ -229,7 +229,7 @@ class TestEnv(TestCase):
 
 
     def test_a_correctly_formatted_env_file_is_successfully_processed(self):
-        with helpers.temporary_directory():
+        with utils.temporary_directory():
             env_filename = ".env"
             env_file_content = """
                 APP_NAME="OneTwo"
@@ -285,7 +285,7 @@ class TestSsl(TestCase):
         certificate_directory = "ssl-certificate"
         certificate_filename = "le-certificate"
 
-        with helpers.temporary_directory():
+        with utils.temporary_directory():
             os.mkdir(key_directory)
             os.mkdir(certificate_directory)
 
