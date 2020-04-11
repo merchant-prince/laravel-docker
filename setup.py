@@ -1,19 +1,18 @@
-from setuptools import find_packages, setup
-
+from setuptools import setup
 
 with open("README.md", "r") as readme:
     long_description = readme.read()
 
 setup(
-    name = "harivansh-laravel-docker",
-    version = "0.2.0",
-    description = "A package to automate the installation of Laravel projects on Docker.",
-    long_description = long_description,
-    long_description_content_type = "text/markdown",
-    url = "https://github.com/merchant-prince/laravel-docker",
-    author = "Harivansh",
-    author_email = "hello@harivan.sh",
-    classifiers = [
+    name="harivansh-laravel-docker",
+    version="0.3.0",
+    description="A package to automate the installation of Laravel projects on Docker.",
+    long_description=long_description,
+    long_description_content_type="text/markdown",
+    url="https://github.com/merchant-prince/laravel-docker",
+    author="Harivansh",
+    author_email="hello@harivan.sh",
+    classifiers=[
         "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",
         "Topic :: Software Development :: Build Tools",
@@ -21,11 +20,11 @@ setup(
         "Programming Language :: Python :: 3.8",
         "Operating System :: POSIX"
     ],
-    keywords = "laravel docker",
-    packages = find_packages(),
-    package_data = {"templates": ["templates/*"]},
-    python_requires = '>=3.8',
-    install_requires = [
+    keywords="laravel docker",
+    packages=["laravel_docker"],
+    package_data={"laravel_docker": ["templates/*"]},
+    python_requires='>=3.8',
+    install_requires=[
         "cryptography",
         "harivansh-scripting-utilities"
     ]
