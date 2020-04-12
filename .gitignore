@@ -1,6 +1,5 @@
 .env/
 .idea/
-.vscode/
 .credentials
 
 harivansh_laravel_docker/__pycache__/
@@ -10,4 +9,3 @@ tests/harivansh_laravel_docker/__pycache__/
 
 build/
 dist/
-harivansh_laravel_docker.egg-info/
