@@ -1,0 +1,79 @@
+version: "3.7"
+
+
+services:
+  nginx:
+    image: nginx:${NGINX_IMAGE_TAG}
+    volumes:
+      - ./configuration/nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./configuration/nginx/ssl:/etc/nginx/ssl:ro
+      - ./application/${PROJECT_NAME}:/var/www/html:ro
+    ports:
+      - "80:80"
+      - "443:443"
+      - "${ADMINER_PORT}:${ADMINER_PORT}"
+    restart: always
+    depends_on:
+      - php
+      - postgresql
+    networks:
+      - nginx
+
+  php:
+    build:
+      context: ./dockerfiles/php
+      args:
+        - PHP_FPM_IMAGE_TAG
+        - USER_ID
+        - GROUP_ID
+    volumes:
+      - ./dockerfiles/php/entrypoint.sh:/home/www-data/custom-entrypoint.sh:ro
+      - ./configuration/php/custom-php.ini:${PHP_INI_DIR}/conf.d/custom-php.ini:ro
+      - ./application/${PROJECT_NAME}:/var/www/html
+    restart: always
+    networks:
+      - nginx
+      - postgresql
+      - redis
+
+  postgresql:
+    image: postgres:${POSTGRES_IMAGE_TAG}
+    volumes:
+      - postgresql:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+    restart: always
+    networks:
+      - postgresql
+      - adminer
+
+  redis:
+    image: redis:${REDIS_IMAGE_TAG}
+    volumes:
+      - redis:/data
+    restart: always
+    networks:
+      - redis
+
+  adminer:
+    image: adminer:${ADMINER_IMAGE_TAG}
+    depends_on:
+      - postgresql
+    restart: always
+    networks:
+      - adminer
+      - nginx
+
+
+networks:
+  nginx:
+  postgresql:
+  redis:
+  adminer:
+
+
+volumes:
+  postgresql:
+  redis:
