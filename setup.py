@@ -22,7 +22,13 @@ setup(
     ],
     keywords="laravel docker",
     packages=["harivansh_laravel_docker"],
-    package_data={"harivansh_laravel_docker": ["templates/*"]},
+    package_data={
+        "harivansh_laravel_docker": [
+            "templates/*",
+            "templates/configuration/nginx/*",
+            "templates/dockerfiles/php/*"
+        ]
+    },
     python_requires='>=3.8',
     install_requires=[
         "cryptography",
