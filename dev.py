@@ -38,7 +38,7 @@ if __name__ == "__main__":
     parser.add_argument("--push", action="store_true", default=False, help="Whether to push the project to pypi.")
     arguments = parser.parse_args()
 
-    image_name = "laravel_docker_image"
+    image_name = "harivansh_laravel_docker_image"
 
     if arguments.action == "test":
         image_tag = "test"

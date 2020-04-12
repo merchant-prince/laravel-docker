@@ -1,6 +1,6 @@
 cffi==1.14.0
 cryptography==2.9
-harivansh-scripting-utilities==0.3.3
+harivansh-scripting-utilities==0.4.0
 pycparser==2.20
 six==1.14.0
 termcolor==1.1.0
