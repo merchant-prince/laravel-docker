@@ -1,6 +1,7 @@
 .env/
 .idea/
 .vscode/
+.credentials
 
 laravel_docker/__pycache__/
 
