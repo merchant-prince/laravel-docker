@@ -17,7 +17,7 @@ RUN cp "${PHP_INI_DIR}/php.ini-development" "${PHP_INI_DIR}/php.ini"
 
 ###                                                                    ###
 # Change the UID and GID of the www-data so that there are no permission #
-# conflicts on the files manipulated by the container.                   #
+# conflicts on the files created/manipulated by the container.           #
 ###                                                                    ###
 
 ARG USER_ID
@@ -40,6 +40,7 @@ RUN userdel -f www-data && \
           /home/www-data
 
 # Setup cron & associated logging
+# @todo: add dedicated cron file for www-data
 RUN touch /var/log/application.cron.log \
  && chown www-data:www-data /var/log/application.cron.log \
  && echo "* * * * *    www-data    php /var/www/html/artisan schedule:run >> /var/log/application.cron.log 2>&1" >> /etc/crontab

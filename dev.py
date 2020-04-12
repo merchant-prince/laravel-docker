@@ -23,6 +23,7 @@ def env(filepath):
 
 def build_image(name, tag, target):
     run(["docker", "build",
+         "--file", "dev.Dockerfile",
          "--build-arg", f"USER={os.geteuid()}",
          "--build-arg", f"GROUP={os.getegid()}",
          "--target", target,

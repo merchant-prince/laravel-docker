@@ -110,12 +110,12 @@ class Validation:
     @staticmethod
     def is_url(value):
         url_regex = re.compile(
-            r'^'
-            r'(?:http|ftp)s?://'  # scheme
-            r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?))'  # domain
-            r'(?::\d+)?'  # port (optional)
-            r'(?:/?|[/?]\S+)'  # path
-            r'$',
+            r"^"
+            r"(?:http|ftp)s?://"  # scheme
+            r"(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?))"  # domain
+            r"(?::\d+)?"  # port (optional)
+            r"(?:/?|[/?]\S+)"  # path
+            r"$",
             re.IGNORECASE
         )
 

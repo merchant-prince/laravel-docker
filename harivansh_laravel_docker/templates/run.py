@@ -8,14 +8,13 @@ import argparse
 from subprocess import run
 
 
-def get_project_environment_variables(file_path):
+def project_environment_variables(file_path):
+    key_value_regex = re.compile(r"^(?P<key>\w+)=(?P<value>[\S]*)$")
     environment = {}
 
     with open(file_path) as environment_file:
-        env_regex = re.compile(r"^(?P<key>\w+)=(?P<value>[\S]*)$")
-
         for line in environment_file:
-            matches = env_regex.match(line)
+            matches = key_value_regex.match(line)
 
             if matches is not None:
                 matches = matches.groupdict()
@@ -25,14 +24,17 @@ def get_project_environment_variables(file_path):
 
 
 if __name__ == "__main__":
-    env = get_project_environment_variables(".env")
+    env = project_environment_variables(".env")
 
     parser = argparse.ArgumentParser(
         description=f"Perform common tasks on the {env['PROJECT_NAME']} application stack.")
 
-    parser.add_argument("tool", help="Define a tool to use on the application stack.",
+    parser.add_argument("tool",
+                        help="Define a tool to use on the application stack.",
                         choices=("artisan", "composer", "yarn", "phpunit"))
-    parser.add_argument("arguments", nargs=argparse.REMAINDER, help="Optional arguments to pass to the specified tool.")
+    parser.add_argument("arguments",
+                        nargs=argparse.REMAINDER,
+                        help="Optional arguments to pass to the specified tool.")
 
     parsed = parser.parse_args()
 
