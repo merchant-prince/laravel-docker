@@ -15,7 +15,7 @@ from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.x509.oid import NameOID
 from harivansh_scripting_utilities.helpers import cd
 
-from laravel_docker.helpers import Parser, Question, Validation
+from harivansh_laravel_docker.helpers import Parser, Question, Validation
 
 
 class ProjectEnvironment:

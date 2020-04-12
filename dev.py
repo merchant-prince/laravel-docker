@@ -47,7 +47,7 @@ if __name__ == "__main__":
              "--rm",
              "--user", f"{os.geteuid()}:{os.getegid()}",
              f"{image_name}:{image_tag}",
-             "python3", "-m", "unittest", "discover", "-s", "tests/laravel_docker"],
+             "python3", "-m", "unittest", "discover", "-s", "tests/harivansh_laravel_docker"],
             check=True)
 
     elif arguments.action == "build":

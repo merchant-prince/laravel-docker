@@ -3,7 +3,7 @@ from unittest import TestCase
 
 from harivansh_scripting_utilities.helpers import cd, capturestdout, injectstdin, tmpdir
 
-from laravel_docker.core import CreateSkeleton, Env, ProjectEnvironment, Ssl
+from harivansh_laravel_docker.core import CreateSkeleton, Env, ProjectEnvironment, Ssl
 
 
 class TestProjectEnvironment(TestCase):

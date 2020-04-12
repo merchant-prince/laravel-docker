@@ -8,7 +8,7 @@ ARG GROUP
 RUN mkdir /application \
  && chown ${USER}:${GROUP} /application
 
-COPY --chown=${USER}:${GROUP} [ "laravel_docker", "/application/laravel_docker" ]
+COPY --chown=${USER}:${GROUP} [ "harivansh_laravel_docker", "/application/harivansh_laravel_docker" ]
 COPY --chown=${USER}:${GROUP} [ "tests", "/application/tests" ]
 COPY --chown=${USER}:${GROUP} [ ".credentials", "LICENSE", "README.md", "requirements.txt", "setup.py", "/application/" ]
 

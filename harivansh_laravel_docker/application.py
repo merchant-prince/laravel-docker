@@ -2,8 +2,10 @@ from subprocess import run
 
 from harivansh_scripting_utilities.helpers import cd
 
-from laravel_docker.core import CreateSkeleton, Env, LaravelInstaller, ProjectConfiguration, ProjectEnvironment, Ssl
-from laravel_docker.helpers import log
+from harivansh_laravel_docker.core import (
+    CreateSkeleton, Env, LaravelInstaller, ProjectConfiguration, ProjectEnvironment, Ssl
+)
+from harivansh_laravel_docker.helpers import log
 
 
 class Application:

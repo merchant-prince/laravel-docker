@@ -4,7 +4,7 @@ from unittest import TestCase
 
 from harivansh_scripting_utilities.helpers import injectstdin, capturestdout, tmpdir
 
-from laravel_docker.helpers import log, Parser, Question, Validation
+from harivansh_laravel_docker.helpers import log, Parser, Question, Validation
 from tests.utils import raise_
 
 

@@ -21,8 +21,8 @@ setup(
         "Operating System :: POSIX"
     ],
     keywords="laravel docker",
-    packages=["laravel_docker"],
-    package_data={"laravel_docker": ["templates/*"]},
+    packages=["harivansh_laravel_docker"],
+    package_data={"harivansh_laravel_docker": ["templates/*"]},
     python_requires='>=3.8',
     install_requires=[
         "cryptography",

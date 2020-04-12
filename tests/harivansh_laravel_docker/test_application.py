@@ -3,8 +3,8 @@ from unittest import TestCase
 
 from harivansh_scripting_utilities.helpers import capturestdout, injectstdin, tmpdir
 
-from laravel_docker.application import Application
-from laravel_docker.core import ProjectConfiguration, ProjectEnvironment
+from harivansh_laravel_docker.application import Application
+from harivansh_laravel_docker.core import ProjectConfiguration, ProjectEnvironment
 
 
 class TestProjectConfiguration(TestCase):
