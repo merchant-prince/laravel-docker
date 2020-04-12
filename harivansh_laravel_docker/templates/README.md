@@ -102,6 +102,7 @@ It supports the following commands:
 
 # COMPOSER
 # To run any composer command in the php service
+# The php service needs to be running for the following command to work
 
 ./run composer COMMAND [ARGS]
 

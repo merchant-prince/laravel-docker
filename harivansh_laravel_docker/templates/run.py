@@ -42,14 +42,7 @@ if __name__ == "__main__":
         run(["docker-compose", "exec", "--user", "www-data", "php", "php", "artisan"] + parsed.arguments)
 
     elif parsed.tool == "composer":
-        run(["docker", "run",
-             "--rm",
-             "--interactive",
-             "--tty",
-             "--user", f"{env['USER_ID']}:{env['GROUP_ID']}",
-             "--workdir", "/application",
-             "--mount", f"type=bind,source={os.getcwd()}/application/{env['PROJECT_NAME']},target=/application",
-             f"composer:{env['COMPOSER_IMAGE_TAG']}"] + parsed.arguments)
+        run(["docker-compose", "exec", "--user", "www-data", "php", "composer"] + parsed.arguments)
 
     elif parsed.tool == "yarn":
         run(["docker", "run",

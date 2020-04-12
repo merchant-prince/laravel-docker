@@ -12,6 +12,9 @@ RUN apt-get update \
  && apt autoremove \
  && rm -rf /var/lib/apt/lists/*
 
+# Setup composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
 # Setup php.ini file
 RUN cp "${PHP_INI_DIR}/php.ini-development" "${PHP_INI_DIR}/php.ini"
 
