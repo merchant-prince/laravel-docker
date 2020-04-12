@@ -40,7 +40,6 @@ RUN userdel -f www-data && \
           /home/www-data
 
 # Setup cron & associated logging
-# @todo: add dedicated cron file for www-data
 RUN touch /var/log/application.cron.log \
  && chown www-data:www-data /var/log/application.cron.log \
  && echo "* * * * *    www-data    php /var/www/html/artisan schedule:run >> /var/log/application.cron.log 2>&1" >> /etc/crontab
