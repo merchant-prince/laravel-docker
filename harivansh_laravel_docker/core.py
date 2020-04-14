@@ -305,7 +305,8 @@ class ProjectConfiguration:
             (Parser().read_template(Parser.template_path("README.md"))
              .parse({
                 "PROJECT_NAME": self._configuration["project"]["name"],
-                "APP_URL": self._configuration["application"]["environment"]["APP_URL"]
+                "APP_URL": self._configuration["application"]["environment"]["APP_URL"],
+                "SELENIUM_PORT": self._configuration["services"]["selenium"]["port"]
              })
              .output("README.md"))
 

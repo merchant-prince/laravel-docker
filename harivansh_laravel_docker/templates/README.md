@@ -145,7 +145,7 @@ public static function prepare()
 protected function driver()
 {
     return RemoteWebDriver::create(
-        'http://selenium:4444/wd/hub',
+        'http://selenium:[[SELENIUM_PORT]]/wd/hub',
         DesiredCapabilities::firefox()
             ->setCapability("acceptInsecureCerts", true)
     );
