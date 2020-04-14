@@ -11,13 +11,16 @@ services:
     ports:
       - "80:80"
       - "443:443"
-      - "${ADMINER_PORT}:${ADMINER_PORT}"
+      - "${ADMINER_PORT}:8080"
     restart: always
     depends_on:
       - php
       - postgresql
     networks:
-      - nginx
+      nginx:
+      selenium:
+        aliases:
+          - ${PROJECT_DOMAIN}
 
   php:
     build:
@@ -35,6 +38,7 @@ services:
       - nginx
       - postgresql
       - redis
+      - selenium
 
   postgresql:
     image: postgres:${POSTGRES_IMAGE_TAG}
@@ -66,12 +70,33 @@ services:
       - adminer
       - nginx
 
+  selenium:
+    image: selenium/hub:${SELENIUM_IMAGE_TAG}
+    depends_on:
+      - php
+    ports:
+      - "${SELENIUM_PORT}:4444"
+    networks:
+      - selenium
+
+  firefox:
+    image: selenium/node-firefox:${FIREFOX_IMAGE_TAG}
+    depends_on:
+      - selenium
+    volumes:
+      - /dev/shm:/dev/shm
+    environment:
+      HUB_HOST: selenium
+    networks:
+      - selenium
+
 
 networks:
   nginx:
   postgresql:
   redis:
   adminer:
+  selenium:
 
 
 volumes:

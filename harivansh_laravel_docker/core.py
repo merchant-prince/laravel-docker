@@ -51,6 +51,9 @@ class ProjectEnvironment:
             "services": {
                 "adminer": {
                     "port": 8080
+                },
+                "selenium": {
+                    "port": 4444
                 }
             },
 
@@ -234,8 +237,7 @@ class ProjectConfiguration:
                         # utils.conf
                         (Parser().read_template(Parser.template_path("configuration/nginx/utils.conf"))
                          .parse({
-                            "PROJECT_DOMAIN": self._configuration["project"]["domain"],
-                            "ADMINER_PORT": self._configuration["services"]["adminer"]["port"]
+                            "PROJECT_DOMAIN": self._configuration["project"]["domain"]
                          })
                          .output("utils.conf"))
 
@@ -260,9 +262,11 @@ class ProjectConfiguration:
 
             environment_variables = {
                 "PROJECT_NAME": self._configuration["project"]["name"],
+                "PROJECT_DOMAIN": self._configuration["project"]["domain"],
                 "USER_ID": self._configuration["environment"]["uid"],
                 "GROUP_ID": self._configuration["environment"]["gid"],
                 "ADMINER_PORT": self._configuration["services"]["adminer"]["port"],
+                "SELENIUM_PORT": self._configuration["services"]["selenium"]["port"],
                 "SSL_KEY_NAME": self._configuration["ssl"]["key_name"],
                 "SSL_CERTIFICATE_NAME": self._configuration["ssl"]["certificate_name"],
                 "DB_NAME": self._configuration["application"]["environment"]["DB_DATABASE"],

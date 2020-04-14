@@ -126,6 +126,40 @@ It supports the following commands:
 # e.g.: ./run phpunit
 ```
 
+## Optional Packages
+
+### [Dusk](https://laravel.com/docs/master/dusk)
+
+The **selenium**, and **firefox** services are available by default to be used with dusk. If you are not using the
+laravel/dusk framework for testing, remove the aforementioned services from the project's **docker-compose.yml** file.
+
+If you are using laravel/dusk for testing, then, after requiring & installing laravel/dusk, you need to setup the
+**tests/DuskTestCase.php** file to resemble the following snippet:
+
+```php
+// [DuskTestCase.php]
+
+...
+
+public static function prepare()
+{
+    // static::startChromeDriver();
+}
+
+...
+
+protected function driver()
+{
+    return RemoteWebDriver::create(
+        'http://selenium:4444/wd/hub',
+        DesiredCapabilities::firefox()
+            ->setCapability("acceptInsecureCerts", true)
+    );
+}
+
+...
+```
+
 ## FAQ
 
 Visit [makeareadme](https://www.makeareadme.com) for a detailed explanation on
