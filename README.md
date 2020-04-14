@@ -17,6 +17,7 @@ surrounding system (database, redis, adminer, etc...) on [Docker](https://www.do
 
 This project can be installed using [pip](https://pip.pypa.io/en/stable).
 The relevant package can be found [here](https://pypi.org/project/harivansh-laravel-docker).
+
 The installation can be done as follows:
 
 ```sh
@@ -34,7 +35,7 @@ The package author assumes the following:
 
 ## Usage
 
-To run the application and install a new Laravel project in the current working directory, run the following command:
+To install a new Laravel project in the current working directory, run the following command:
 
 ```sh
 python3 -m harivansh_laravel_docker
