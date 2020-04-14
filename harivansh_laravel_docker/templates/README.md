@@ -2,7 +2,7 @@
 
 ## Architecture
 
-The directory structure of this project is as follows:
+Its directory structure of is as follows:
 
 ```
 [[PROJECT_NAME]]      <----  The root project directory
@@ -40,18 +40,16 @@ The directory structure of this project is as follows:
 │
 ├── README.md
 │
-└── run     <----  An executable script used to run several commands on the
-                    Laravel application
+└── run     <----  An executable script used to run several commands on the Laravel application
 ```
 
 ## Configuration
 
 The main configuration of the project lies in the ```.env``` file.
-It consists of several environment/configuration variables which are used during
-the build step of the docker containers, and when running the application.
+It consists of several environment/configuration variables which are used during the build step of the docker
+containers, and when running the application.
 
-It is a **dumb** version of a typical dotenv file. It **only** supports the
-following template for each line:
+It is a **dumb** version of a typical dotenv file. It **only** supports the following template for each line:
 
 ```env
 ENVIRONMENT_VARIABLE_NAME=VALUE
@@ -65,28 +63,24 @@ Each line in the file should adhere to the following regex:
 ^([a-zA-Z][a-zA-Z0-9_]*)=(.*)?$
 ```
 
-The only two files that require this file to run are:
+The files that require this file to run are:
 
 * docker-compose.yml
 * run
 
 ## Running
 
-To start the Laravel application, ```cd``` in the project root directory and run
-the following:
+To start the Laravel application, ```cd``` in the project root directory and run the following:
 
 ```sh
 docker-compose up
 ```
 
-This will start the project, and the laravel application will be accessible
-at the domain defined during the installation.
-This defaults to [https://application.local](https://application.local).
+This will start the project, and the laravel application will be available at [[[APP_URL]]]([[APP_URL]]).
 
 ## Commands
 
-The ```run``` executable is a convenience script used to run commonly used
-commands in the Laravel application.
+The ```run``` executable is a convenience script used to run commonly used commands in the Laravel application.
 
 It supports the following commands:
 
@@ -162,5 +156,4 @@ protected function driver()
 
 ## FAQ
 
-Visit [makeareadme](https://www.makeareadme.com) for a detailed explanation on
-creating readmes.
+Visit [makeareadme](https://www.makeareadme.com) for a detailed explanation on creating readmes.

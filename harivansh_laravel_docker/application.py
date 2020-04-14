@@ -21,7 +21,8 @@ class Application:
         self._configuration = None
 
     @log("Setting up a new Laravel project.")
-    @log("Your project was successfully installed.", type="success", position="after")
+    @log("Please read the project's README file for further information.", position="after")
+    @log("Your project was successfully installed.", type="success", position="after", suffix="\n")
     def run(self):
         """
         The main method. It is here that all the various steps - of setting up the project - are called.

@@ -231,7 +231,7 @@ class Parser:
             file.write(self.parsed_template_string)
 
 
-def log(message, type="info", position="before"):
+def log(message, type="info", position="before", prefix="\n", suffix="\n\n"):
     """
     Outputs a log message before or after running the decorated function
 
@@ -246,6 +246,12 @@ def log(message, type="info", position="before"):
         position (str):
             Where to print the message; i.e. before or after calling the decorated function.
             The accepted values are: ["before", "after"]
+
+        prefix (str):
+            The message prefix.
+
+        suffix (str):
+            The message suffix.
     """
 
     if type not in ["success", "info", "warning", "error", "plain"]:
@@ -270,7 +276,7 @@ def log(message, type="info", position="before"):
         else:
             prettified_message = message
 
-        print(f"\n{prettified_message}\n\n", end="")
+        print(f"{prefix}{prettified_message}{suffix}", end="")
 
     def decorator(function):
         def wrapper(*args, **kwargs):
