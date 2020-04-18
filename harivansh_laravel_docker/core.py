@@ -49,8 +49,9 @@ class ProjectEnvironment:
 
             # Docker-compose service environment values.
             "services": {
-                "adminer": {
-                    "port": 8080
+                "pgadmin": {
+                    "email": "hello@harivan.sh",
+                    "password": "password"
                 },
                 "selenium": {
                     "port": 4444
@@ -265,7 +266,8 @@ class ProjectConfiguration:
                 "PROJECT_DOMAIN": self._configuration["project"]["domain"],
                 "USER_ID": self._configuration["environment"]["uid"],
                 "GROUP_ID": self._configuration["environment"]["gid"],
-                "ADMINER_PORT": self._configuration["services"]["adminer"]["port"],
+                "PGADMIN_EMAIL": self._configuration["services"]["pgadmin"]["email"],
+                "PGADMIN_PASSWORD": self._configuration["services"]["pgadmin"]["password"],
                 "SELENIUM_PORT": self._configuration["services"]["selenium"]["port"],
                 "SSL_KEY_NAME": self._configuration["ssl"]["key_name"],
                 "SSL_CERTIFICATE_NAME": self._configuration["ssl"]["certificate_name"],

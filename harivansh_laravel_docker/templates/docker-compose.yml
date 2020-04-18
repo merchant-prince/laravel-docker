@@ -11,7 +11,6 @@ services:
     ports:
       - "80:80"
       - "443:443"
-      - "${ADMINER_PORT}:8080"
     restart: always
     depends_on:
       - php
@@ -51,7 +50,7 @@ services:
     restart: always
     networks:
       - postgresql
-      - adminer
+      - pgadmin
 
   redis:
     image: redis:${REDIS_IMAGE_TAG}
@@ -61,13 +60,18 @@ services:
     networks:
       - redis
 
-  adminer:
-    image: adminer:${ADMINER_IMAGE_TAG}
+  pgadmin:
+    image: dpage/pgadmin4:${PGADMIN_IMAGE_TAG}
+    volumes:
+      - pgadmin:/var/lib/pgadmin
+    environment:
+      - PGADMIN_DEFAULT_EMAIL
+      - PGADMIN_DEFAULT_PASSWORD
     depends_on:
       - postgresql
     restart: always
     networks:
-      - adminer
+      - pgadmin
       - nginx
 
   selenium:
@@ -95,10 +99,11 @@ networks:
   nginx:
   postgresql:
   redis:
-  adminer:
+  pgadmin:
   selenium:
 
 
 volumes:
   postgresql:
+  pgadmin:
   redis:
