@@ -76,6 +76,19 @@ To start the Laravel application, ```cd``` in the project root directory and run
 docker-compose up
 ```
 
+## Services
+
+The following services are available in this stack:
+@todo: add details about each.
+
+* nginx
+* php
+* postgresql
+* redis
+* pgadmin
+* selenium
+* firefox
+
 This will start the project, and the laravel application will be available at [[[APP_URL]]]([[APP_URL]]).
 
 ## Commands
