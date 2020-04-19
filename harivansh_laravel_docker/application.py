@@ -25,7 +25,7 @@ class Application:
     @log("Your project was successfully installed.", type="success", position="after", suffix="\n")
     def run(self):
         """
-        The main method. It is here that all the various steps - of setting up the project - are called.
+        The main method. It is here that the various steps of setting up the project are called.
         """
 
         (self
@@ -55,8 +55,7 @@ class Application:
     @log("Configuring the project environment.")
     def _configure(self):
         """
-        Ask the user some questions concerning the project to scaffold, and record the answers in the configuration
-        dict.
+        Ask the user some questions concerning the project to scaffold, and add the answers in the configuration dict.
         """
 
         self._configuration = ProjectEnvironment().initialize().get()

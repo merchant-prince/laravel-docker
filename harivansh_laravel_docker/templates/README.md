@@ -76,20 +76,28 @@ To start the Laravel application, ```cd``` in the project root directory and run
 docker-compose up
 ```
 
+This will start the project, and the laravel application will be available at [[[APP_URL]]]([[APP_URL]]).
+
 ## Services
 
 The following services are available in this stack:
-@todo: add details about each.
 
-* nginx
-* php
-* postgresql
-* redis
-* pgadmin
-* selenium
-* firefox
-
-This will start the project, and the laravel application will be available at [[[APP_URL]]]([[APP_URL]]).
+<dl>
+    <dt>Nginx</dt>
+    <dd>This service exposes ports 80 and 443 from which the Laravel application, and PgAdmin will be accessible.</dd>
+    <dt>PHP</dt>
+    <dd>The php fpm server for nginx. It handles all the calls to PHP.</dd>
+    <dt>PostgreSQL</dt>
+    <dd>The application's main database.</dd>
+    <dt>Redis</dt>
+    <dd>The redis server used in several contexts across the Laravel application.</dd>
+    <dt>PgAdmin</dt>
+    <dd>This service exposes the PgAdmin application at http://pgadmin.[[PROJECT_DOMAIN]].</dd>
+    <dt>Selenium</dt>
+    <dd>This is the selenium hub used for testing the Laravel application through dusk.</dd>
+    <dt>Firefox</dt>
+    <dd>This is the browser used for testing the application through dusk.</dd>
+</dl>
 
 ## Commands
 

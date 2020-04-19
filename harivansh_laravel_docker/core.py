@@ -12,7 +12,6 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
-from cryptography.x509.oid import NameOID
 from harivansh_scripting_utilities.helpers import cd
 
 from harivansh_laravel_docker.helpers import Parser, Question, Validation
@@ -307,6 +306,7 @@ class ProjectConfiguration:
             (Parser().read_template(Parser.template_path("README.md"))
              .parse({
                 "PROJECT_NAME": self._configuration["project"]["name"],
+                "PROJECT_DOMAIN": self._configuration["project"]["domain"],
                 "APP_URL": self._configuration["application"]["environment"]["APP_URL"],
                 "SELENIUM_PORT": self._configuration["services"]["selenium"]["port"]
              })
@@ -440,7 +440,7 @@ class Ssl:
         )
 
         name = x509.Name([
-            x509.NameAttribute(NameOID.COMMON_NAME, self._hostname)
+            x509.NameAttribute(x509.NameOID.COMMON_NAME, self._hostname)
         ])
 
         san = x509.SubjectAlternativeName([

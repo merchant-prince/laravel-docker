@@ -8,7 +8,8 @@ set -e
 if ! (php -r "echo php_ini_scanned_files();" | grep -q "custom-php.ini")
 then
     echo "Could not find the 'custom-php.ini' file in the additional .ini files array."
-    echo "Please verify that the PHP_INI_DIR of the .env file is the same as the one defined in the php service."
+    echo "Verify that the PHP_INI_DIR of the .env file is the same as the one defined in the php service."
+    echo "(see PHP_INI_DIR in the .env file in the project root)."
     exit 1
 fi
 

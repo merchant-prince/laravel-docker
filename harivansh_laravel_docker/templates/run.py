@@ -1,10 +1,9 @@
 #! /usr/bin/env python3
 
-
+import argparse
 import os
 import re
 import sys
-import argparse
 from subprocess import run
 
 
@@ -27,15 +26,15 @@ if __name__ == "__main__":
     env = project_environment_variables(".env")
 
     parser = argparse.ArgumentParser(
-        description=f"Perform common tasks on the {env['PROJECT_NAME']} application stack.")
-
+        "run",
+        description=f"Perform common tasks on the {env['PROJECT_NAME']} application stack."
+    )
     parser.add_argument("tool",
                         help="Define a tool to use on the application stack.",
                         choices=("artisan", "composer", "yarn", "phpunit"))
     parser.add_argument("arguments",
                         nargs=argparse.REMAINDER,
                         help="Optional arguments to pass to the specified tool.")
-
     parsed = parser.parse_args()
 
     if parsed.tool == "artisan":
@@ -51,7 +50,7 @@ if __name__ == "__main__":
              "--tty",
              "--user", f"{env['USER_ID']}:{env['GROUP_ID']}",
              "--workdir", "/application",
-             "--mount", f"type=bind,source={os.getcwd()}/application/{env['PROJECT_NAME']},target=/application",
+             "--mount", f"type=bind,source={os.getcwd()}/application/{env['PROJECT_NAME']},destination=/application",
              f"node:{env['NODE_IMAGE_TAG']}", "yarn"] + parsed.arguments)
 
     elif parsed.tool == "phpunit":
