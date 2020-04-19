@@ -11,7 +11,7 @@
 ![GitHub](https://img.shields.io/github/license/merchant-prince/laravel-docker?style=flat-square)
 
 This package is used to automate the installation of a [Laravel](https://laravel.com) project with the associated
-surrounding system (database, redis, adminer, etc...) on [Docker](https://www.docker.com).
+surrounding system (database, redis, pgadmin, selenium, etc...) on [Docker](https://www.docker.com).
 
 ## Installation
 
