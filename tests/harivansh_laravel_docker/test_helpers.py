@@ -184,8 +184,7 @@ class TestParser(TestCase):
 
         self.assertEqual(parser.parsed_template_string, expected_parsed_template_string)
 
-    def test_a_template_is_successfully_parsed_with_a_custom_delimiters_creator_if_the_correct_variables_mapping_is_provided(
-            self):
+    def test_a_template_is_successfully_parsed_with_a_custom_delimiters_creator_if_the_correct_variables_mapping_is_provided(self):
         template_string = "The user's name is {{LE_NAME}} and his email is {{LE_EMAIL}}."
         variables = {
             "NAME": "Harivansh",
