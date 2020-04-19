@@ -65,7 +65,7 @@ if __name__ == "__main__":
         run(["docker", "run",
              "--rm",
              "--user", f"{os.getuid()}:{os.getegid()}",
-             "--mount", f"type=bind,source={os.getcwd()}/{dist_dirname},dst=/application/{dist_dirname}",
+             "--mount", f"type=bind,source={os.getcwd()}/{dist_dirname},destination=/application/{dist_dirname}",
              f"{image_name}:{image_tag}",
              "python3", "setup.py", "sdist", "bdist_wheel"],
             check=True)
@@ -76,7 +76,7 @@ if __name__ == "__main__":
             run(["docker", "run",
                  "--rm",
                  "--user", f"{os.geteuid()}:{os.getegid()}",
-                 "--mount", f"type=bind,source={os.getcwd()}/{dist_dirname},dst=/application/{dist_dirname},readonly",
+                 "--mount", f"type=bind,source={os.getcwd()}/{dist_dirname},destination=/application/{dist_dirname},readonly",
                  f"{image_name}:{image_tag}",
                  "twine", "upload",
                  "--username", credentials["USERNAME"],

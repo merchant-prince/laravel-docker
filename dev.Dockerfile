@@ -10,14 +10,13 @@ RUN mkdir /application \
 
 COPY --chown=${USER}:${GROUP} [ "harivansh_laravel_docker", "/application/harivansh_laravel_docker" ]
 COPY --chown=${USER}:${GROUP} [ "tests", "/application/tests" ]
-COPY --chown=${USER}:${GROUP} [ ".credentials", "LICENSE", "README.md", "requirements.txt", "setup.py", "/application/" ]
+COPY --chown=${USER}:${GROUP} [ "LICENSE", "README.md", "requirements.txt", "setup.py", "/application/" ]
 
 WORKDIR /application
 
 VOLUME [ "/application/dist" ]
 
-RUN pip install --upgrade pip \
- && pip install -r requirements.txt
+RUN pip install -r requirements.txt
 
 
 FROM test as build

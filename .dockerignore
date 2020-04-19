@@ -1,0 +1,7 @@
+.env/
+dist/
+.credentials
+.credentials.example
+.gitignore
+dev.Dockerfile
+dev.py
