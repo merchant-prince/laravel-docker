@@ -53,9 +53,6 @@ if __name__ == "__main__":
              "--mount", f"type=bind,source={os.getcwd()}/application/{env['PROJECT_NAME']},destination=/application",
              f"node:{env['NODE_IMAGE_TAG']}", "yarn"] + parsed.arguments)
 
-    elif parsed.tool == "phpunit":
-        run(["docker-compose", "exec", "--user", "www-data", "php", "php", "./vendor/bin/phpunit"] + parsed.arguments)
-
     else:
         parser.print_help()
         sys.exit(1)
