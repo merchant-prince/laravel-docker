@@ -5,7 +5,7 @@ with open("README.md", "r") as readme:
 
 setup(
     name="harivansh-laravel-docker",
-    version="0.5.0",
+    version="0.5.1",
     description="A package to automate the installation of Laravel projects on Docker.",
     long_description=long_description,
     long_description_content_type="text/markdown",
