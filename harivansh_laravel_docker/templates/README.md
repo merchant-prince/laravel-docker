@@ -113,6 +113,7 @@ It supports the following commands:
 ./run artisan COMMAND [ARGS]
 
 # e.g.: ./run artisan migrate:fresh --seed
+# e.g.: ./run artisan test
 
 
 # COMPOSER
@@ -130,15 +131,6 @@ It supports the following commands:
 ./run yarn COMMAND [ARGS]
 
 # e.g.: ./run yarn watch-poll
-
-
-# PHPUNIT
-# To run any tests defined in the /tests directory of the Laravel project
-# The php service needs to be running for the following command to work
-
-./run phpunit [COMMAND [ARGS]]
-
-# e.g.: ./run phpunit
 ```
 
 ## Optional Packages
